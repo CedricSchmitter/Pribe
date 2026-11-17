@@ -395,3 +395,61 @@
   background: var(--card-bg);
   font-size: clamp(2rem, 11vw, 4rem);
 }
+
+.preview-html {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.preview-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--stroke);
+  background: #000;
+}
+.preview-stage iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border: 0;
+  background: #fff;
+}
+.preview-html.full {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  padding: var(--space-2);
+  background: #000;
+}
+.preview-html.full .preview-stage {
+  flex: 1;
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 0;
+}
+.preview-full-button {
+  align-self: flex-end;
+  min-height: var(--touch-min);
+}
+.preview-html.full .preview-full-button {
+  color: #fff;
+}
+.preview-pptx {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--card-bg);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius);
+}
+.preview-pptx-icon {
+  font-size: 2rem;
+}
+.submit .preview-pptx-title {
+  margin: var(--space-1) 0 0;
+  color: var(--text-soft);
+  overflow-wrap: anywhere;
+}
