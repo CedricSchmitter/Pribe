@@ -77,11 +77,11 @@ sie lokal per `git merge --no-ff` nach `main` (Nutzer-Freigabe). Nur der Orchest
 | Q2 Submit-Vorschau | R81 | 4112/4212 | – | gemerged 7d85ea4 |
 | Q3 Show-Extras | R84 Vortrags-Bewertung + Rampensau, R85 Emoji-Combo, R86 Foto-Wand | 4113/4213 | – | gemerged b81a2de |
 | Q4 Fernbedienung + „Du präsentierst!“ | R80, R82 | 4114/4214 | – | gemerged 9fb6969 |
-| Q5 Probelauf-Modus | R83 | 4115/4215 | Q1, Q3 | läuft |
-| Q6 Code-Splitting + Gesamttest-Update | R89, E2E/Demo um Welle 2 erweitern | 4116/4216 | alle | wartet |
+| Q5 Probelauf-Modus | R83 | 4115/4215 | Q1, Q3 | gemerged 5027590 |
+| Q6 Code-Splitting + Gesamttest-Update | R89, E2E/Demo um Welle 2 erweitern | 4116/4216 | alle | läuft |
 
 ## Next concrete action
-Q5-Bericht abwarten. Pro Bericht: Gate-Subagent, `git merge --no-ff`, Nachprüfung, abhaken.
+Q6-Bericht abwarten. Pro Bericht: Gate-Subagent, `git merge --no-ff`, Nachprüfung, abhaken.
 Nach Q1+Q3 Q5 freigeben, danach Q6. Am Ende App neu bauen und starten, Nutzer für den
 Push um den temporären github.com-Login bitten, dann L11 Generalprobe.
 ## Terrain (working set)

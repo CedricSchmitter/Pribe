@@ -37,3 +37,4 @@ lives in STATE.md; this is how we got there.
 
 - Welle 2: Nach dem ersten gemeinsamen Test ("es war funny") wählte der Nutzer R80–R89 → D30. Schnitt in Q1–Q6, Q1–Q4 parallel gestartet. Die zehn P-Sessions wurden auf Wunsch des Nutzers archiviert.
 - Welle 2 gemerged: Q2 (7d85ea4, Vorschau), Q1 (9f69df2, Login-Sperre mit `TRUST_PROXY` + drei Reset-Wege), Q4 (9fb6969, `/remote` + „Du präsentierst!“ + Finale-Station serverseitig), Q3 (b81a2de, Vortrags-Sterne + Rampensau, Emoji-Combo serverseitig in `game/combo.ts`, Foto-Wand). Gates grün. Q3 hat die Konflikte mit Q1 und Q4 selbst gelöst. Nachprüfung nach Q1/Q2/Q4: 145 Tests grün. Q5 ist freigegeben.
+- Q5 Probelauf gemerged (5027590): Probelauf mit separatem `DATA_DIR/probelauf`, 5 Server-Bots, Banner; das Dockerfile kopiert `demo/` ins Image. Nachprüfung: 158 Tests und Build grün. Q6 ist freigegeben.
