@@ -25,6 +25,7 @@ import type { TopicAssignment } from '../db/repos/topics';
 import { deleteSubmissionFiles, uploadsOpen } from './submitFiles';
 import { personRoutes, requirePerson } from './submitPerson';
 import { avatarRoutes } from './submitPhoto';
+import { submitPreviewRoutes } from './submitPreview';
 
 const toTopicDto = (a: TopicAssignment): TopicDto => ({ index: a.topicIndex, title: topicTitle(a.topicIndex) });
 
@@ -75,6 +76,7 @@ export async function submitRoutes(app: FastifyInstance, ctx: AppContext): Promi
   });
   await personRoutes(app, ctx, sessions);
   await avatarRoutes(app, ctx);
+  await submitPreviewRoutes(app, ctx, sessions);
 
   app.get(API_PATHS.persons, async (): Promise<Person[]> => repos.persons.list());
 

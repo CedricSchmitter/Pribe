@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { emojiRain, sideCannons, Stamp, Sunburst } from '../../fx';
 import { burstConfetti } from '../../lib/confetti';
 import { useToast } from '../../shell';
+import { SubmissionPreview } from './SubmissionPreview';
 import { precheckFile, uploadFile, UploadError } from './uploadClient';
 
 const STATUS_VIEW = {
@@ -116,6 +117,7 @@ export function UploadCard({
           </motion.div>
         )}
       </AnimatePresence>
+      {mine?.status === 'ready' && <SubmissionPreview mine={mine} />}
 
       {status.uploadsOpen ? (
         <div className="stack">

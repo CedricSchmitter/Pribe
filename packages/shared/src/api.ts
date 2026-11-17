@@ -29,6 +29,10 @@ export const API_PATHS = {
     submission: (id: SubmissionId) => `/api/submit/submissions/${encodeURIComponent(id)}`,
     /** GET: the logged-in person's own submission (`SubmissionStatusDto`), 404 without one. */
     mine: '/api/submit/mine',
+    /** GET: `SubmissionPreviewDto` of the own ready submission (R81), 404 otherwise. */
+    minePreview: '/api/submit/mine/preview',
+    /** GET: the own ready HTML file, sandboxed via CSP (D04); 404 for PPTX. */
+    mineFile: '/api/submit/mine/file',
     /** GET: `TopicResponseDto` for the logged-in person. */
     topic: '/api/submit/topic',
     /** POST: assigns a topic once (D26); later calls return the same one. */
@@ -153,6 +157,11 @@ export interface SubmitStatusDto {
   maxUploadMb: number;
   serverTime: EpochMs;
 }
+
+/** Own-submission preview on `/submit` (R81); carries nothing that identifies the person. */
+export type SubmissionPreviewDto =
+  | { kind: 'html' }
+  | { kind: 'pptx'; slideCount: number; firstSlideTitle: string | null };
 
 /** Returned by the upload; the phone keeps `submissionId` to poll its status (R24). */
 export interface SubmissionStatusDto {
