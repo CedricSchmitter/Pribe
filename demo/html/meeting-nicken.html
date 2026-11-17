@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Die Kunst des Meeting-Nickens</title>
+<style>
+  html, body { margin: 0; height: 100%; background: linear-gradient(135deg, #2779c4, #0b2545); color: #fff; font-family: Arial, sans-serif; overflow: hidden; }
+  .slide { position: absolute; inset: 0; padding: 6vw; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center;
+           opacity: 0; transform: translateY(10vh); transition: all .5s ease; }
+  .slide.on { opacity: 1; transform: none; }
+  h1 { font-size: 6vw; margin: 0 0 2vw; }
+  li { font-size: 3vw; margin: 1vw 0; }
+  .head { font-size: 14vw; display: inline-block; animation: nod 1s infinite; transform-origin: 50% 80%; }
+  .fast { animation-duration: .25s; }
+  @keyframes nod { 50% { transform: rotate(14deg); } }
+  .progress { position: absolute; left: 0; bottom: 0; height: .8vw; background: #ffd000; transition: width .4s; }
+</style>
+</head>
+<body>
+<section class="slide"><h1>Die Kunst des Meeting-Nickens</h1><div class="head">🙂</div></section>
+<section class="slide"><h1>Level 1: Das Zustimmungs-Nicken</h1><div class="head">😌</div><ul><li>Langsam, würdevoll</li><li>Signalisiert: „Ich habe zugehört“ (habe ich nicht)</li></ul></section>
+<section class="slide"><h1>Level 2: Das Doppel-Nicken</h1><div class="head fast">😯</div><ul><li>Bedeutet: „Genau das wollte ich auch sagen“</li></ul></section>
+<section class="slide"><h1>Level 3: Das Kamera-aus-Nicken</h1><ul><li>Niemand sieht es</li><li>Trotzdem wichtig für die innere Haltung</li><li>Profis nicken auch beim Mikro-stumm-Schalten</li></ul></section>
+<section class="slide"><h1>Übung</h1><div class="head">🫡</div><ul><li>Alle jetzt bitte einmal nicken</li><li>Danke, Meeting beendet</li></ul></section>
+<div class="progress" id="p"></div>
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  let i = 0;
+  const show = () => { slides.forEach((s, k) => s.classList.toggle('on', k === i)); document.getElementById('p').style.width = ((i + 1) / slides.length * 100) + '%'; };
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight', 'ArrowDown', ' ', 'PageDown', 'Enter'].includes(e.key)) i = Math.min(slides.length - 1, i + 1);
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(e.key)) i = Math.max(0, i - 1);
+    else return;
+    e.preventDefault(); show();
+  });
+  document.addEventListener('click', (e) => { i = e.clientX < innerWidth / 3 ? Math.max(0, i - 1) : Math.min(slides.length - 1, i + 1); show(); });
+  show();
+</script>
+</body>
+</html>

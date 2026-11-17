@@ -1,0 +1,24 @@
+{
+  "name": "@pribe/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/index.ts",
+    "build": "tsup"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.1.5",
+    "@fastify/multipart": "^10.1.9",
+    "@fastify/static": "^10.1.11",
+    "fastify": "^5.12.8",
+    "fflate": "^0.8.3",
+    "socket.io": "^4.8.4",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.4",
+    "tsup": "^9.0.0",
+    "tsx": "^4.23.15"
+  }
+}

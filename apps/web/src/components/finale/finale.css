@@ -1,0 +1,438 @@
+.finale-avatar {
+  display: inline-flex;
+  border-radius: 50%;
+  flex: none;
+}
+
+.finale-network-node {
+  overflow: visible;
+}
+
+.finale-network-node > .avatar {
+  border: 5px solid var(--surface-default);
+}
+
+/* ---- Host ---- */
+.finale {
+  position: relative;
+  height: 100%;
+  overflow: clip;
+  background: var(--surface-default);
+  color: var(--text-default);
+}
+
+.finale-station {
+  height: 100%;
+  padding: var(--space-6) var(--space-6) 120px;
+}
+
+.finale-center {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+.finale .finale-hero {
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: clamp(4rem, 9vw, 9rem);
+  line-height: 1;
+  margin: 0;
+}
+
+.finale .finale-title {
+  margin: 0 0 var(--space-5);
+  text-align: center;
+}
+
+.finale-sub {
+  font-size: 1.3em;
+  margin: 0;
+  text-align: center;
+}
+
+.finale-empty {
+  font-family: var(--font-bold);
+  font-weight: 700;
+  font-size: 1.6em;
+  text-align: center;
+}
+
+.finale-trophy {
+  font-size: 14rem;
+  line-height: 1;
+  filter: drop-shadow(0 12px 30px rgba(255, 208, 0, 0.6));
+}
+
+.finale-controls {
+  position: absolute;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  z-index: 30;
+}
+
+.finale-controls button {
+  min-height: 72px;
+  font-size: 1.1em;
+}
+
+.finale-progress {
+  font-family: var(--font-bold);
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+/* Leaderboard countdown */
+.finale-board-wrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.finale-board {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  width: min(100%, 1100px);
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+.finale-board.two-cols {
+  width: 100%;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(var(--rows, 9), auto);
+}
+
+.finale-board-row.card {
+  width: auto;
+  display: grid;
+  grid-template-columns: 3.2em auto minmax(6em, 1fr) minmax(4em, 2fr) 2.4em;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+}
+
+.finale-board-rank,
+.finale-board-points {
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: 1.4em;
+  text-align: right;
+}
+
+.finale-board-name {
+  font-family: var(--font-bold);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.finale-board-bar {
+  height: 18px;
+  background: var(--surface-strong);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.finale-board-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+
+/* Podium */
+.finale-podium-wrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.finale-podium {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: var(--space-5);
+  width: min(100%, 1400px);
+  margin: 0 auto;
+}
+
+.finale-podium-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.finale-podium-people {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--space-6);
+  padding-bottom: var(--space-4);
+}
+
+.finale-podium-person {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.finale-crown {
+  position: absolute;
+  top: -1.4em;
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+.finale-podium-name {
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: 1.5em;
+}
+
+.finale-podium-points {
+  font-family: var(--font-bold);
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.finale-podium-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: var(--space-4);
+  overflow: hidden;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--surface-strong);
+  border: 3px solid var(--stroke);
+  border-bottom: 0;
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.finale-podium-slot.rank-1 .finale-podium-step {
+  background: var(--surface-primary);
+  border-color: var(--surface-primary);
+  color: var(--text-on-primary);
+}
+
+.finale-podium-rank {
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: 2em;
+}
+
+/* Awards */
+.finale-award-emoji {
+  font-size: 10rem;
+  line-height: 1;
+}
+
+.finale-award-winners {
+  min-height: 300px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+}
+
+.finale-award-winner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.finale-drum {
+  font-size: 7rem;
+  line-height: 1;
+}
+
+/* Guess network */
+.finale-network-wrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.finale-network-wrap .finale-title {
+  margin-bottom: var(--space-1);
+}
+
+.finale-network {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.finale-network-name {
+  font-family: var(--font-bold);
+  font-weight: 700;
+  font-size: 32px;
+  fill: var(--text-default);
+}
+
+.finale-network-count {
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: 24px;
+  fill: #fff;
+  paint-order: stroke;
+  stroke: #000;
+  stroke-width: 3px;
+}
+
+/* Best presentation */
+.finale-best-list {
+  display: flex;
+  gap: var(--space-6);
+  justify-content: center;
+  flex-wrap: wrap;
+  perspective: 1200px;
+}
+
+.finale-best.card {
+  width: auto;
+  min-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  box-shadow: 0 0 60px rgba(255, 208, 0, 0.45);
+  border: 4px solid var(--surface-primary);
+}
+
+.finale-best .label {
+  font-size: 1em;
+  line-height: 1.3;
+}
+
+.finale-best-people {
+  display: flex;
+  gap: var(--space-6);
+  align-items: flex-end;
+}
+
+.finale-best-person {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.finale-best-name {
+  font-family: var(--font-bold);
+  font-weight: 700;
+}
+
+.finale-stars {
+  font-size: 3em;
+}
+
+.finale-best-avg {
+  font-family: var(--font-bold);
+  font-weight: 700;
+  font-size: 1.4em;
+}
+
+/* ---- Phone ---- */
+.finale-phone h1 {
+  margin: 0;
+}
+
+.finale-phone-trophy {
+  font-size: 6rem;
+  line-height: 1;
+}
+
+.finale-phone-reveal {
+  min-height: 56px;
+  font-size: 1.1rem;
+  padding: 0 var(--space-5);
+}
+
+.finale-phone-rank {
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: 7rem;
+  line-height: 1;
+}
+
+.finale-phone-rank.top {
+  color: #ffd000;
+  text-shadow: 0 4px 20px rgba(255, 208, 0, 0.6), 0 0 2px #000;
+}
+
+.finale-phone-points {
+  font-family: var(--font-bold);
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.finale-phone-awards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  align-items: center;
+}
+
+.finale-phone-award.card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: left;
+}
+
+.finale-phone-award-emoji {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+/* P8 effects behind the podium */
+.finale-podium-wrap {
+  position: relative;
+}
+
+.finale-podium-wrap > :not(.fx-sunburst):not(.fx-spotlights) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ties put many people on one step; keep them on the stage. */
+.finale-podium,
+.finale-podium-slot {
+  min-height: 0;
+}
+
+.finale-podium-people.dense {
+  gap: var(--space-3) var(--space-4);
+}
+
+.finale-podium-people.dense .finale-podium-name {
+  font-size: 1em;
+}
+
+.finale-podium-people.dense .finale-podium-points {
+  font-size: 0.7em;
+}

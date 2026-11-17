@@ -1,0 +1,287 @@
+/* Look per DESIGN.md (D18). Animations are exempt and may override colors freely. */
+:root {
+  --surface-default: #ffffff;
+  --surface-soft: #f9fafb;
+  --surface-strong: #f0f3f6;
+  --surface-primary: #ffd000;
+  --text-on-primary: #000000;
+  --text-default: #000000;
+  --text-soft: #6b7278;
+  --stroke: #d3d8dd;
+  --textinput-stroke: #000000;
+  --color-focus-outline: #000000;
+  --overlay-backdrop: rgba(58, 64, 70, 0.2);
+  --toast-surface: #353a40;
+  --toast-text: #ffffff;
+  --scrollbar-thumb: #bdc4ca;
+  --shadow-flyout: 0 10px 50px rgba(0, 0, 0, 0.17);
+
+  --page-bg: var(--surface-strong);
+  --card-bg: var(--surface-default);
+
+  --color-success: #73d95f;
+  --color-warning: #f89939;
+  --color-error: #ff7070;
+  --color-neutral: #bdc4ca;
+  --inline-warning-surface: #e3a735;
+  --brand-blue: #2779c4;
+  --steel-light: #bdc4ca;
+  --steel-dark: #51585d;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --radius: 4px;
+  --touch-min: 48px;
+  --content-max: 90rem;
+
+  --font: -apple-system, BlinkMacSystemFont, Arial, Helvetica, sans-serif;
+  --font-bold: -apple-system, BlinkMacSystemFont, Arial, Helvetica, sans-serif;
+  --font-head: -apple-system, BlinkMacSystemFont, Arial, Helvetica, sans-serif;
+
+  --header-h: 48px;
+  --rail-collapsed: 70px;
+  --rail-expanded: 240px;
+  --bottombar-h: 56px;
+
+  color-scheme: light;
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-default);
+  background: var(--page-bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --surface-default: #202326;
+    --surface-soft: #282c30;
+    --surface-strong: #353a40;
+    --text-default: #ffffff;
+    --text-soft: #9ea4ab;
+    --stroke: #51585d;
+    --textinput-stroke: #888e94;
+    --color-focus-outline: #ffffff;
+    --overlay-backdrop: rgba(0, 0, 0, 0.7);
+    --scrollbar-thumb: #9ea4ab;
+    --inline-warning-surface: #ffc385;
+    --page-bg: var(--surface-default);
+    --card-bg: var(--surface-soft);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --surface-default: #202326;
+  --surface-soft: #282c30;
+  --surface-strong: #353a40;
+  --text-default: #ffffff;
+  --text-soft: #9ea4ab;
+  --stroke: #51585d;
+  --textinput-stroke: #888e94;
+  --color-focus-outline: #ffffff;
+  --overlay-backdrop: rgba(0, 0, 0, 0.7);
+  --scrollbar-thumb: #9ea4ab;
+  --inline-warning-surface: #ffc385;
+  --page-bg: var(--surface-default);
+  --card-bg: var(--surface-soft);
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--page-bg);
+  overflow: hidden;
+}
+
+* {
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus-outline);
+  outline-offset: 2px;
+}
+
+h1,
+.page-title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+.label {
+  font-family: var(--font-bold);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.78px;
+}
+
+.page {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4);
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 100%;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: center;
+}
+
+.muted {
+  color: var(--text-soft);
+}
+
+.error {
+  color: var(--color-error);
+  margin: 0;
+}
+
+.inline-warning {
+  background: var(--inline-warning-surface);
+  color: #000;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+}
+
+.hero-emoji {
+  font-size: 5rem;
+  line-height: 1;
+}
+
+.card {
+  width: min(100%, 380px);
+  padding: var(--space-5);
+  background: var(--card-bg);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius);
+  text-align: left;
+}
+
+input,
+select,
+textarea,
+button,
+.button {
+  font: inherit;
+  border-radius: var(--radius);
+  min-height: 40px;
+  padding: var(--space-2) var(--space-4);
+}
+
+input,
+select,
+textarea {
+  color: var(--text-default);
+  background: var(--surface-default);
+  border: 1px solid var(--textinput-stroke);
+}
+
+button,
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1px solid var(--stroke);
+  color: var(--text-default);
+  background: var(--card-bg);
+  font-family: var(--font-bold);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Primary actions: yellow surface, black text. */
+button.primary,
+.button.primary,
+button[type='submit'] {
+  background: var(--surface-primary);
+  border-color: var(--surface-primary);
+  color: var(--text-on-primary);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+button.ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+@media (max-width: 767px), (pointer: coarse) {
+  input,
+  select,
+  button,
+  .button {
+    min-height: var(--touch-min);
+  }
+}
+
+.badge {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  font-family: var(--font-bold);
+  font-weight: 700;
+  font-size: 14px;
+  border: 1px solid var(--stroke);
+}
+
+.badge-connected {
+  border-color: var(--color-success);
+}
+
+.badge-disconnected,
+.badge-unauthorized {
+  border-color: var(--color-error);
+}
+
+/* Beamer: scale up for distance reading (R2). */
+.host {
+  font-size: clamp(1.25rem, 2vw, 2.25rem);
+}
+
+.host h1 {
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  line-height: 1.15;
+}

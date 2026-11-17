@@ -1,0 +1,21 @@
+services:
+  pribe:
+    build: .
+    image: pribe:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Im Container fest; überschreibt gleichnamige Werte aus .env.
+      PORT: "3000"
+      DATA_DIR: /data
+    ports:
+      # Nur lokal erreichbar; der Reverse Proxy leitet auf 127.0.0.1:4109.
+      - "127.0.0.1:${HOST_PORT:-4109}:3000"
+    volumes:
+      - pribe-data:/data
+    # Speicherlimit für einen kleinen Pi (Node-App, 10–20 Personen). Bei Bedarf
+    # einkommentieren und an den RAM anpassen:
+    # mem_limit: 512m
+
+volumes:
+  pribe-data:

@@ -1,0 +1,340 @@
+.vote-root {
+  position: relative;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  /* clip, not hidden: hidden would make this a scroll container and break the sticky timer and reactions. */
+  overflow-x: clip;
+}
+
+.vote-stage {
+  flex: 1;
+}
+
+.vote-page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4);
+  width: 100%;
+}
+
+.vote-page.center {
+  gap: var(--space-4);
+}
+
+.vote-sub {
+  margin: var(--space-1) 0 0;
+}
+
+.stack-tight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.vote-section-title {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+
+.vote-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.vote-person {
+  width: 100%;
+  min-height: 56px;
+  justify-content: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--card-bg);
+  text-align: left;
+}
+
+.vote-person.selected {
+  background: var(--surface-primary);
+  border-color: var(--surface-primary);
+  color: var(--text-on-primary);
+}
+
+.vote-person-name {
+  flex: 1;
+  font-size: 16px;
+}
+
+.vote-check {
+  font-size: 22px;
+}
+
+.vote-guess-line {
+  margin: 0;
+  min-height: 24px;
+}
+
+.vote-stars {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.vote-star {
+  flex: 1;
+  min-height: 56px;
+  font-size: 32px;
+  padding: 0;
+  color: var(--steel-light);
+  background: var(--card-bg);
+}
+
+.vote-star.on {
+  color: #000;
+  background: var(--surface-primary);
+  border-color: var(--surface-primary);
+}
+
+.vote-timer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--card-bg);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.vote-live {
+  margin-left: auto;
+  color: var(--color-success);
+  font-family: var(--font-bold);
+  font-weight: 700;
+}
+
+.vote-timer.countdown {
+  justify-content: center;
+}
+
+.vote-seconds {
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: 40px;
+  line-height: 1;
+  min-width: 2ch;
+  text-align: center;
+}
+
+.vote-timer.urgent .vote-seconds {
+  color: var(--color-error);
+}
+
+.vote-timer-bar {
+  flex-basis: 100%;
+  height: 6px;
+  background: var(--surface-strong);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.vote-timer-fill {
+  height: 100%;
+  background: var(--surface-primary);
+  transition: width 0.2s linear;
+}
+
+.vote-timer.urgent .vote-timer-fill {
+  background: var(--color-error);
+}
+
+.vote-closed {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  text-align: center;
+  background: var(--card-bg);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius);
+  font-family: var(--font-bold);
+  font-weight: 700;
+}
+
+/* Sticky at the bottom of the scroll area so reactions stay reachable below a long guess list. */
+.vote-reactions {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0 calc(-1 * var(--space-4)) calc(-1 * var(--space-5));
+  padding: var(--space-2) var(--space-4) var(--space-3);
+  background: var(--page-bg);
+  border-top: 1px solid var(--stroke);
+}
+
+.vote-reaction-row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.vote-reaction {
+  flex: 1;
+  min-height: 64px;
+  font-size: 32px;
+  padding: 0;
+}
+
+.vote-reaction[aria-disabled='true'] {
+  opacity: 0.4;
+}
+
+.vote-meter {
+  height: 6px;
+  background: var(--surface-strong);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.vote-meter-fill {
+  height: 100%;
+  background: var(--color-success);
+}
+
+.vote-meter-fill[data-empty] {
+  background: var(--color-error);
+}
+
+.vote-slow {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-bold);
+  font-weight: 700;
+  color: var(--color-error);
+}
+
+.vote-flyers {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  pointer-events: none;
+}
+
+.vote-flyer {
+  position: absolute;
+  font-size: 32px;
+}
+
+.vote-waiting .muted {
+  margin: 0;
+}
+
+.vote-pool {
+  margin: 0;
+  font-family: var(--font-bold);
+  font-weight: 700;
+}
+
+.vote-spinner {
+  font-size: 80px;
+  line-height: 1;
+}
+
+.vote-presenter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  background: var(--card-bg);
+  border: 1px solid var(--stroke);
+  border-radius: 999px;
+}
+
+.vote-dots {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.vote-dots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--surface-primary);
+}
+
+.vote-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 120px;
+  pointer-events: none;
+}
+
+.vote-outcome {
+  font-size: 36px;
+  line-height: 1.15;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
+}
+
+.vote-owner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.vote-owner p {
+  margin: 0;
+}
+
+.vote-owner-name {
+  font-size: 24px;
+}
+
+.vote-offline {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  padding: var(--space-2) var(--space-4);
+  background: var(--toast-surface);
+  color: var(--toast-text);
+  border-left: 6px solid var(--color-warning);
+  text-align: center;
+}
+
+.vote-change-name {
+  align-self: center;
+  margin: var(--space-2) 0 var(--space-4);
+  color: var(--text-soft);
+  font-family: var(--font);
+  font-weight: 400;
+  font-size: 14px;
+}
+
+/* P8 effects */
+.vote-waiting,
+.vote-reveal {
+  position: relative;
+  isolation: isolate;
+}
+
+.vote-waiting > :not(.fx-floaters),
+.vote-reveal > :not(.fx-sunburst) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Floaters must not widen the page on small phones. */
+.vote-waiting .fx-floaters {
+  font-size: 16px;
+}

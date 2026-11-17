@@ -1,0 +1,30 @@
+{
+  "name": "pribe",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n server,web -c blue,magenta \"npm run dev -w @pribe/server\" \"npm run dev -w @pribe/web\"",
+    "typecheck": "tsc --noEmit -p packages/shared && tsc --noEmit -p apps/server && tsc --noEmit -p apps/web",
+    "build": "npm run typecheck && npm run build -w @pribe/web && npm run build -w @pribe/server",
+    "start": "node apps/server/dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "vitest run apps/server/src/e2e",
+    "demo:seed": "tsx scripts/demo-seed.ts",
+    "demo:pptx": "node scripts/demo-pptx.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "concurrently": "^10.0.7",
+    "pptxgenjs": "^4.0.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}

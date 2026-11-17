@@ -1,0 +1,9 @@
+node_modules/
+dist/
+data/
+.env
+*.log
+coverage/
+*.tsbuildinfo
+.claude/worktrees/
+.claude/launch.json

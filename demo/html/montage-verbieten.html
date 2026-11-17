@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Warum Montage verboten gehören</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; color: #fff; font-family: Arial, Helvetica, sans-serif; overflow: hidden; }
+  .slide { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 6vw; box-sizing: border-box;
+           opacity: 0; transform: translateX(8vw) rotate(2deg); transition: all .5s cubic-bezier(.2,1.6,.4,1); }
+  .slide.on { opacity: 1; transform: none; }
+  h1 { font-size: 7vw; margin: 0 0 3vw; line-height: 1; }
+  p, li { font-size: 3.2vw; line-height: 1.4; }
+  .big { font-size: 18vw; font-weight: bold; text-align: center; }
+  .red { color: #ff7070; } .yellow { color: #ffd000; } .green { color: #73d95f; }
+  .bar { height: 5vw; background: #ffd000; margin: 1vw 0; transition: width 1.2s ease; width: 0; }
+  .on .bar { width: var(--w); }
+  footer { position: absolute; bottom: 2vw; right: 3vw; font-size: 1.6vw; opacity: .5; }
+</style>
+</head>
+<body>
+<section class="slide"><h1>Warum Montage <span class="red">verboten</span> gehören</h1><p>Ein Faktencheck mit wissenschaftlich klingenden Zahlen</p></section>
+<section class="slide"><h1>These</h1><p class="big yellow">MO</p><p>Zwei Buchstaben. Unendliches Leid.</p></section>
+<section class="slide"><h1>Laune pro Wochentag</h1>
+  <p>Montag</p><div class="bar" style="--w: 8%"></div>
+  <p>Mittwoch</p><div class="bar" style="--w: 45%"></div>
+  <p>Freitag</p><div class="bar" style="--w: 97%"></div>
+</section>
+<section class="slide"><h1>Gegenargumente</h1><ul><li>„Ohne Montag kein Dienstag“ – <span class="green">widerlegt</span>, siehe Wochenende</li><li>„Montag ist auch nur ein Tag“ – <span class="red">gefährliche Verharmlosung</span></li></ul></section>
+<section class="slide"><h1>Forderung</h1><p class="big">🛌</p><p>Ab sofort: Sonntag, Sonntag 2, Dienstag.</p></section>
+<footer id="n"></footer>
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  let i = 0;
+  const show = () => { slides.forEach((s, k) => s.classList.toggle('on', k === i)); document.getElementById('n').textContent = (i + 1) + ' / ' + slides.length; };
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight', 'ArrowDown', ' ', 'PageDown', 'Enter'].includes(e.key)) i = Math.min(slides.length - 1, i + 1);
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(e.key)) i = Math.max(0, i - 1);
+    else return;
+    e.preventDefault(); show();
+  });
+  document.addEventListener('click', (e) => { i = e.clientX < innerWidth / 3 ? Math.max(0, i - 1) : Math.min(slides.length - 1, i + 1); show(); });
+  show();
+</script>
+</body>
+</html>

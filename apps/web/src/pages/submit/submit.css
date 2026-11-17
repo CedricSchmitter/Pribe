@@ -1,0 +1,397 @@
+.submit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 560px;
+}
+
+.submit .hint {
+  font-size: 14px;
+  margin: 0;
+}
+
+.submit p {
+  margin: 0;
+}
+
+.submit .stack-tight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Topic roulette */
+.wheel-wrap {
+  position: relative;
+  width: min(100%, 340px);
+  margin: 0 auto;
+  padding-top: var(--space-3);
+}
+
+.wheel {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.35));
+}
+
+.wheel-label {
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: 11px;
+  fill: #fff;
+  paint-order: stroke;
+  stroke: rgba(0, 0, 0, 0.45);
+  stroke-width: 2px;
+}
+
+.wheel-pointer {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  z-index: 1;
+  margin-left: -14px;
+  width: 28px;
+  font-size: 28px;
+  line-height: 1;
+  text-align: center;
+  color: var(--surface-primary);
+  text-shadow: 0 2px 0 #000;
+  transform-origin: 50% 0;
+}
+
+.wheel-ticker {
+  min-height: 3em;
+  text-align: center;
+  font-family: var(--font-bold);
+  font-weight: 700;
+}
+
+.topic-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  background: var(--surface-primary);
+  color: var(--text-on-primary);
+  text-align: center;
+}
+
+.topic-card.small {
+  text-align: left;
+  gap: var(--space-1);
+}
+
+.topic-title {
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.topic-card.small .topic-title {
+  font-size: 18px;
+}
+
+.topic-legend summary {
+  cursor: pointer;
+  color: var(--text-soft);
+  min-height: var(--touch-min);
+  display: flex;
+  align-items: center;
+}
+
+.topic-legend ol {
+  margin: 0;
+  padding-left: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: 14px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.deadline-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--card-bg);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius);
+}
+
+.deadline-banner.urgent {
+  border-color: var(--color-warning);
+  box-shadow: 0 0 0 2px var(--color-warning);
+}
+
+.deadline-banner.closed {
+  border-color: var(--color-error);
+}
+
+.pool-counter {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.pool-count {
+  display: inline-block;
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: 44px;
+  line-height: 1;
+}
+
+.pool-label {
+  font-family: var(--font-bold);
+  font-weight: 700;
+}
+
+.deadline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  font-size: 14px;
+}
+
+.deadline-clock {
+  display: inline-block;
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+.person-picker {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+
+.person-pick {
+  width: 100%;
+  justify-content: flex-start;
+  min-height: 64px;
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+}
+
+.me-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.me-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.me-name {
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 32px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.my-status {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  color: #000;
+}
+
+.my-status p {
+  margin: var(--space-1) 0 0;
+}
+
+.my-status.status-converting {
+  background: var(--color-warning);
+}
+
+.my-status.status-ready {
+  background: var(--color-success);
+}
+
+.my-status.status-failed {
+  background: var(--color-error);
+}
+
+.my-status-emoji {
+  display: inline-block;
+  font-size: 36px;
+  line-height: 1;
+}
+
+.my-status-kind {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.upload-button {
+  min-height: 64px;
+  font-size: 18px;
+}
+
+.progress {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  border: 1px solid var(--stroke);
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background: var(--surface-primary);
+}
+
+.locked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  background: var(--card-bg);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+/* Registration (D27) */
+.row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.register-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.segmented {
+  display: flex;
+  flex: 1;
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.segmented button {
+  flex: 1;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.segmented button.active {
+  background: var(--surface-primary);
+  color: var(--text-on-primary);
+}
+
+.photo-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.photo-buttons .button {
+  flex: 1 1 140px;
+}
+
+.register .emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: var(--space-1);
+}
+
+.register .emoji-choice {
+  min-height: 44px;
+  padding: 0;
+  font-size: 24px;
+  border-color: transparent;
+  background: transparent;
+}
+
+.register .color-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.register .color-choice {
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid var(--stroke);
+}
+
+.register .emoji-choice.selected,
+.register .color-choice.selected {
+  border: 3px solid var(--surface-primary);
+}
+
+.person-picker-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* P8: upload success overlay. Portaled to <body> so the page transition transform cannot trap `position: fixed`. */
+.upload-celebrate {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  overflow: hidden;
+  background: var(--overlay-backdrop);
+  font-size: 16px;
+}
+
+.upload-celebrate > :not(.fx-sunburst) {
+  position: relative;
+  z-index: 1;
+}
+
+.upload-celebrate-rocket {
+  font-size: 96px;
+  line-height: 1;
+}
+
+.upload-celebrate .fx-stamp {
+  background: var(--card-bg);
+  font-size: clamp(2rem, 11vw, 4rem);
+}
