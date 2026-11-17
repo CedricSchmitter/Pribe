@@ -21,6 +21,8 @@ RUN npm ci --omit=dev --workspace=@pribe/server && npm cache clean --force
 
 COPY --from=build /app/apps/server/dist ./apps/server/dist
 COPY --from=build /app/apps/web/dist ./apps/web/dist
+# Sample presentations for the admin's test run (R83).
+COPY demo ./demo
 
 RUN mkdir /data && chown node:node /data
 VOLUME /data

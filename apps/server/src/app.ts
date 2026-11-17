@@ -8,6 +8,8 @@ import type { AppContext } from './context';
 import { createConversionQueue } from './conversion';
 import { createRepositories, openDatabase } from './db';
 import { WEB_DIST_DIR } from './paths';
+import { createProbe, createSwitchableDb } from './probe';
+import type { BotOptions } from './probe/bots';
 import { registerRoutes } from './routes';
 import { ownerHash } from './security/hmac';
 import { createSocketServer } from './sockets';
@@ -17,21 +19,29 @@ export interface BuildAppOptions {
   /** Defaults to `config.dbFile`; tests pass `:memory:`. */
   dbFile?: string;
   webDistDir?: string;
+  /** Tests speed up the test-run bots. */
+  probeBots?: BotOptions;
 }
 
-export async function buildApp(config: Config, opts: BuildAppOptions = {}) {
+export async function buildApp(inputConfig: Config, opts: BuildAppOptions = {}) {
+  // Own copy: the test run redirects its data paths (R83).
+  const config = { ...inputConfig };
   mkdirSync(config.filesDir, { recursive: true });
-  const db = openDatabase(opts.dbFile ?? config.dbFile);
-  const repos = createRepositories(db);
+  const realDb = openDatabase(opts.dbFile ?? config.dbFile);
+  const dbSwitch = createSwitchableDb(realDb);
+  const repos = createRepositories(dbSwitch.db);
+  const stateEvents: AppContext['stateEvents'] = new EventEmitter();
+  const hash = (personId: string) => ownerHash(personId, config.secret);
 
   const ctx: AppContext = {
     config,
-    db,
+    db: dbSwitch.db,
     repos,
     conversion: createConversionQueue(config, repos),
     sessions: createSessionCodec(config.secret),
-    ownerHash: (personId) => ownerHash(personId, config.secret),
-    stateEvents: new EventEmitter(),
+    ownerHash: hash,
+    stateEvents,
+    probe: createProbe({ config, dbSwitch, ownerHash: hash, stateEvents, bots: opts.probeBots }),
   };
 
   const app = Fastify({
@@ -46,11 +56,13 @@ export async function buildApp(config: Config, opts: BuildAppOptions = {}) {
   await registerStatic(app, opts.webDistDir ?? WEB_DIST_DIR);
 
   const sockets = createSocketServer(app.server, ctx);
+  ctx.probe.attachGame(sockets.bots);
 
   app.addHook('onClose', async () => {
+    ctx.probe.shutdown();
     await sockets.close();
     await ctx.conversion.close();
-    db.close();
+    realDb.close();
   });
 
   return { app, ctx, sockets };

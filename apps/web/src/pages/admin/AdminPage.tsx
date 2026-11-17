@@ -1,8 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
+import { API_PATHS, type ProbeStatusDto } from '@pribe/shared';
 import { LoginForm } from '../../components/LoginForm';
+import { ProbeBanner } from '../../components/ProbeBanner';
+import { api } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { PersonsPanel } from './PersonsPanel';
+import { ProbePanel } from './ProbePanel';
 import { ResetPanel } from './ResetPanel';
 import { SettingsPanel } from './SettingsPanel';
 import { SubmissionsPanel } from './SubmissionsPanel';
@@ -13,6 +17,13 @@ export function AdminPage() {
   const { authenticated, login } = useAuth();
   // Bumped after a reset so panels that load once remount with fresh data.
   const [resets, setResets] = useState(0);
+  const [probe, setProbe] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (!authenticated) return;
+    api<ProbeStatusDto>(API_PATHS.admin.probe)
+      .then((r) => setProbe(r.active))
+      .catch(() => setProbe(false));
+  }, [authenticated]);
   if (authenticated === null) return null;
 
   if (!authenticated) {
@@ -32,14 +43,18 @@ export function AdminPage() {
     );
   }
 
+  // The test run swaps every data source, so all panels reload with it.
+  const world = `${resets}-${probe ? 'probe' : 'real'}`;
   return (
     <main className="page admin">
+      {probe && <ProbeBanner />}
       <h1>Admin</h1>
       <div className="admin-grid">
-        <PersonsPanel key={`persons-${resets}`} />
+        <PersonsPanel key={`persons-${world}`} />
         <div className="admin-column">
-          <SettingsPanel />
-          <SubmissionsPanel key={`submissions-${resets}`} />
+          {probe !== null && <ProbePanel active={probe} onChange={setProbe} />}
+          <SettingsPanel key={`settings-${world}`} />
+          <SubmissionsPanel key={`submissions-${world}`} />
           <ResetPanel onReset={() => setResets((n) => n + 1)} />
         </div>
       </div>

@@ -78,6 +78,8 @@ export interface SnapshotBase {
   roundCount: number;
   reveal: RevealResult | null;
   finale: FinaleResult | null;
+  /** R83: a test run with bots in a separate database; real phones only see a hint. */
+  probe: boolean;
 }
 
 export interface HostSnapshot extends SnapshotBase {

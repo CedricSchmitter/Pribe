@@ -125,6 +125,14 @@ export async function adminRoutes(app: FastifyInstance, ctx: AppContext): Promis
     return rounds;
   };
 
+  // Resets are meant for the real data (R88); during a test run they would only hit the bots.
+  const resetPaths = new Set<string>([API_PATHS.admin.reset, API_PATHS.admin.resetTopics, API_PATHS.admin.resetAll]);
+  app.addHook('preHandler', async (req, reply) => {
+    if (ctx.probe.active && req.method === 'POST' && resetPaths.has(req.routeOptions.url ?? '')) {
+      return reply.code(409).send(apiError('PROBE_ACTIVE'));
+    }
+  });
+
   // Open screens get the lobby through the onResponse hook above (stateEvents → engine restart).
   app.post(API_PATHS.admin.reset, async (req) => {
     const rounds = transaction(ctx.db, resetGame);
