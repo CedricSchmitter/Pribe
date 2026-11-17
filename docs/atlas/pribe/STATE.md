@@ -73,15 +73,15 @@ sie lokal per `git merge --no-ff` nach `main` (Nutzer-Freigabe). Nur der Orchest
 ## Welle 2 (R80–R89, D30) — Orchestrator merged lokal, Push nach github.com am Ende (Nutzer meldet sich kurz an, D29)
 | Paket | Inhalt | Ports | wartet auf | Stand |
 |---|---|---|---|---|
-| Q1 Admin-Sicherheit + Reset | R87, R88 | 4111/4211 | – | läuft |
-| Q2 Submit-Vorschau | R81 | 4112/4212 | – | läuft |
-| Q3 Show-Extras | R84 Vortrags-Bewertung + Rampensau, R85 Emoji-Combo, R86 Foto-Wand | 4113/4213 | – | läuft |
-| Q4 Fernbedienung + „Du präsentierst!“ | R80, R82 | 4114/4214 | – | läuft |
-| Q5 Probelauf-Modus | R83 | 4115/4215 | Q1, Q3 | wartet |
+| Q1 Admin-Sicherheit + Reset | R87, R88 | 4111/4211 | – | gemerged 9f69df2 |
+| Q2 Submit-Vorschau | R81 | 4112/4212 | – | gemerged 7d85ea4 |
+| Q3 Show-Extras | R84 Vortrags-Bewertung + Rampensau, R85 Emoji-Combo, R86 Foto-Wand | 4113/4213 | – | gemerged b81a2de |
+| Q4 Fernbedienung + „Du präsentierst!“ | R80, R82 | 4114/4214 | – | gemerged 9fb6969 |
+| Q5 Probelauf-Modus | R83 | 4115/4215 | Q1, Q3 | läuft |
 | Q6 Code-Splitting + Gesamttest-Update | R89, E2E/Demo um Welle 2 erweitern | 4116/4216 | alle | wartet |
 
 ## Next concrete action
-Berichte von Q1–Q4 abwarten. Pro Bericht: Gate-Subagent, `git merge --no-ff`, Nachprüfung, abhaken.
+Q5-Bericht abwarten. Pro Bericht: Gate-Subagent, `git merge --no-ff`, Nachprüfung, abhaken.
 Nach Q1+Q3 Q5 freigeben, danach Q6. Am Ende App neu bauen und starten, Nutzer für den
 Push um den temporären github.com-Login bitten, dann L11 Generalprobe.
 ## Terrain (working set)
