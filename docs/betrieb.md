@@ -35,6 +35,7 @@ In `.env` setzen:
 | `MAX_UPLOAD_MB` | Upload-Limit, Standard 100 |
 | `HOST_PORT` | Port auf dem Pi (nur 127.0.0.1), Standard 4109 |
 | `LOG_LEVEL` | optional, Standard `info` |
+| `TRUST_PROXY` | `true` hinter dem Reverse Proxy (siehe unten), Standard `false` |
 
 `PORT` und `DATA_DIR` setzt `docker-compose.yml` im Container fest (3000 und `/data`).
 
@@ -117,6 +118,8 @@ server {
 ```
 
 Die Beispiele sind ungeprüft. Wichtig: das Proxy-Limit (120 MB) liegt über `MAX_UPLOAD_MB` (100), damit Pribe die Fehlermeldung selbst anzeigt.
+
+**Login-Sperre und `TRUST_PROXY`:** Nach 5 falschen Admin-Passwörtern ist der Admin-Login für diese IP 15 Minuten gesperrt (ein Neustart hebt die Sperre auf). Hinter dem Proxy in `.env` `TRUST_PROXY=true` setzen. Pribe nimmt dann die Adresse, die der Proxy als letzte in `X-Forwarded-For` einträgt (Caddy macht das automatisch, nginx mit der Zeile oben). Ohne die Einstellung sieht Pribe nur den Proxy, und ein Ratender sperrt alle aus. Ohne Proxy bleibt sie aus, sonst könnte jeder Client seine IP fälschen.
 
 ## Hinweise für den Pi
 

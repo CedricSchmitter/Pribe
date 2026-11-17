@@ -22,6 +22,8 @@ export const ERROR_CODES = [
   'INVALID_INVITE_CODE',
   'NAME_TAKEN',
   'UNSUPPORTED_IMAGE',
+  /** R87: too many wrong admin passwords from this IP; the message names the remaining time. */
+  'LOGIN_LOCKED',
 ] as const;
 export type ErrorCode = (typeof ERROR_CODES)[number];
 
@@ -48,6 +50,7 @@ export const ERROR_MESSAGES_DE: Record<ErrorCode, string> = {
   INVALID_INVITE_CODE: 'Der Einladungscode stimmt nicht.',
   NAME_TAKEN: 'Diesen Namen gibt es schon.',
   UNSUPPORTED_IMAGE: 'Bitte ein Foto (JPEG, PNG oder WebP) bis 512 KB.',
+  LOGIN_LOCKED: 'Zu viele Fehlversuche. Bitte später erneut versuchen.',
 };
 
 /** Body of every non-2xx REST response and payload of failed socket acks. */

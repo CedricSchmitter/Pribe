@@ -42,10 +42,13 @@ export const RegisterRequestSchema = PersonInputSchema.extend({
 });
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
 
-export const ResetRequestSchema = z.object({
-  deleteSubmissions: z.boolean().default(false),
+/** The word the admin types to confirm „Alles löschen“ (D30). */
+export const RESET_ALL_CONFIRMATION = 'LÖSCHEN';
+
+export const ResetAllRequestSchema = z.object({
+  confirm: z.literal(RESET_ALL_CONFIRMATION),
 });
-export type ResetRequest = z.infer<typeof ResetRequestSchema>;
+export type ResetAllRequest = z.infer<typeof ResetAllRequestSchema>;
 
 // Socket payloads (validated server-side)
 
