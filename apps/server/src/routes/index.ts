@@ -6,6 +6,7 @@ import { adminRoutes } from './admin';
 import { authRoutes } from './auth';
 import { fileRoutes } from './files';
 import { hostRoutes } from './host';
+import { probeRoutes } from './probe';
 import { submitRoutes } from './submit';
 
 export async function registerRoutes(app: FastifyInstance, ctx: AppContext) {
@@ -21,5 +22,6 @@ export async function registerRoutes(app: FastifyInstance, ctx: AppContext) {
     scope.addHook('onRequest', adminGuard(ctx.sessions));
     await adminRoutes(scope, ctx);
     await hostRoutes(scope, ctx);
+    await probeRoutes(scope, ctx);
   });
 }

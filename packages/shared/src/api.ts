@@ -24,6 +24,10 @@ export const API_PATHS = {
     resetTopics: '/api/admin/reset/topics',
     /** POST `ResetAllRequest`: deletes everything except the settings (R88, D30). */
     resetAll: '/api/admin/reset/all',
+    /** GET `ProbeStatusDto`; POST `…/start` and `…/stop` switch the test run with bots (R83). */
+    probe: '/api/admin/probe',
+    probeStart: '/api/admin/probe/start',
+    probeStop: '/api/admin/probe/stop',
   },
   /** Open endpoints for phones (P2). */
   persons: '/api/persons',
@@ -139,6 +143,10 @@ export interface SubmissionOverviewItem {
   id: SubmissionId;
   kind: SubmissionKind;
   status: SubmissionStatus;
+}
+
+export interface ProbeStatusDto {
+  active: boolean;
 }
 
 /** Deleted row counts of a reset (R88); fields a reset does not touch are 0. */

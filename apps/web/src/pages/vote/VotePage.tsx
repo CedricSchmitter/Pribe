@@ -10,7 +10,7 @@ import { useVoteGame } from './useVoteGame';
 import { VoteLogin } from './VoteLogin';
 import { VotingPanel } from './VotingPanel';
 import { MyFinale } from '../../components/finale';
-import { LobbyWaiting, SoonWaiting } from './Waiting';
+import { LobbyWaiting, ProbeWaiting, SoonWaiting } from './Waiting';
 import './vote.css';
 
 type Auth = { kind: 'loading' } | { kind: 'out'; persons: Person[] } | { kind: 'in'; me: Person };
@@ -38,16 +38,33 @@ export function VotePage() {
   const authMeId = auth.kind === 'in' ? auth.me.id : null;
   const serverMe = snapshot?.me;
   const recheckedFor = useRef<string | null>(null);
+  // During a test run the server knows only its bots, so `me: null` says nothing about the login.
+  const probe = snapshot?.probe ?? false;
   useEffect(() => {
     if (serverMe) recheckedFor.current = null;
     // One recheck per login, so a server that keeps answering `me: null` cannot cause a reconnect loop.
-    if (authMeId && status === 'connected' && serverMe === null && recheckedFor.current !== authMeId) {
+    if (!probe && authMeId && status === 'connected' && serverMe === null && recheckedFor.current !== authMeId) {
       recheckedFor.current = authMeId;
       api<PersonMeDto>(API_PATHS.person.me)
         .then((r) => (r.person ? reconnect() : loggedOut()))
         .catch(() => {});
     }
-  }, [authMeId, serverMe, status, reconnect, loggedOut]);
+  }, [probe, authMeId, serverMe, status, reconnect, loggedOut]);
+
+  // A page opened during the test run saw no login; look again once the real game is back.
+  const wasProbe = useRef(false);
+  useEffect(() => {
+    if (wasProbe.current && !probe) {
+      api<PersonMeDto>(API_PATHS.person.me)
+        .then((r) => {
+          if (!r.person) return;
+          setAuth({ kind: 'in', me: r.person });
+          reconnect();
+        })
+        .catch(() => {});
+    }
+    wasProbe.current = probe;
+  }, [probe, reconnect]);
 
   const logout = async () => {
     await api(API_PATHS.person.logout, { method: 'POST', body: {} }).catch(() => {});
@@ -61,7 +78,10 @@ export function VotePage() {
 
   let content;
   let key: string;
-  if (auth.kind === 'out') {
+  if (probe) {
+    key = 'probe';
+    content = <ProbeWaiting />;
+  } else if (auth.kind === 'out') {
     key = 'login';
     content = (
       <VoteLogin
@@ -135,7 +155,7 @@ export function VotePage() {
           📡 Verbindung weg – verbinde neu …
         </motion.div>
       )}
-      {me && snapshot && <PresenterBanner snapshot={snapshot} clockOffset={clockOffset} />}
+      {me && snapshot && !probe && <PresenterBanner snapshot={snapshot} clockOffset={clockOffset} />}
       <AnimatePresence mode="wait">
         <motion.div
           key={key}
@@ -148,7 +168,7 @@ export function VotePage() {
           {content}
         </motion.div>
       </AnimatePresence>
-      {me && snapshot && (
+      {me && snapshot && !probe && (
         <button type="button" className="ghost vote-change-name" onClick={() => void logout()}>
           Nicht {me.name}? Abmelden
         </button>

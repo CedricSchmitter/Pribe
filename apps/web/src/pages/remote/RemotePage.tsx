@@ -3,6 +3,7 @@ import { AWARD_LABELS_DE, type GamePhase, type HostSnapshot, type PersonId } fro
 import { Avatar } from '../../components/Avatar';
 import { ConnectionBadge } from '../../components/ConnectionBadge';
 import { LoginForm } from '../../components/LoginForm';
+import { ProbeBanner } from '../../components/ProbeBanner';
 import { stationsFor, type FinaleStation } from '../../components/finale';
 import { useAuth } from '../../lib/auth';
 import { useToast } from '../../shell';
@@ -99,6 +100,7 @@ function Remote({ game, snap }: { game: HostGame; snap: HostSnapshot }) {
 
   return (
     <div className="remote">
+      {snap.probe && <ProbeBanner />}
       <header className="remote-status card">
         <div className="remote-status-head">
           <span className="remote-phase">{PHASE_LABELS[snap.phase]}</span>

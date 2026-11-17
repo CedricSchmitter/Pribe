@@ -11,8 +11,10 @@ import {
   type ErrorCode,
   type HostSnapshot,
   type PersonId,
+  type ReactionEmoji,
   type VoteSnapshot,
 } from '@pribe/shared';
+import type { BotGame } from '../probe/bots';
 import { createPersonSessions } from '../auth/person';
 import type { AppContext } from '../context';
 import { isOwner } from '../security/hmac';
@@ -48,14 +50,25 @@ function parse<T>(schema: ZodType<T>, payload: unknown): T | null {
  * Game state machine and socket handlers (P4). `host` only admits authenticated
  * sockets. Returns a cleanup function for timers.
  */
-export function registerGame(ns: { host: HostNamespace; vote: VoteNamespace }, ctx: AppContext): () => void {
+export function registerGame(
+  ns: { host: HostNamespace; vote: VoteNamespace },
+  ctx: AppContext,
+): { dispose(): void; bots: BotGame } {
   const { host, vote } = ns;
   const reactions = createThrottle(REACTION_THROTTLE);
   const combos = createComboDetector({ newId: randomUUID });
   const personSessions = createPersonSessions(ctx.config.secret, ctx.repos.persons);
+  const cookiePersonId = (socket: { handshake: { headers: { cookie?: string } } }) =>
+    personSessions.fromCookieHeader(socket.handshake.headers.cookie)?.id ?? null;
+
+  let botIds: PersonId[] = [];
+  const changeListeners = new Set<() => void>();
+  const notifyChange = () => {
+    for (const l of changeListeners) l();
+  };
 
   const connectedPersonIds = (): PersonId[] => {
-    const ids = new Set<PersonId>();
+    const ids = new Set<PersonId>(botIds);
     for (const s of vote.sockets.values()) if (s.data.personId) ids.add(s.data.personId);
     return [...ids];
   };
@@ -81,8 +94,12 @@ export function registerGame(ns: { host: HostNamespace; vote: VoteNamespace }, c
     db: ctx.db,
     repos: ctx.repos,
     isOwner: (personId, hash) => isOwner(personId, hash, ctx.config.secret),
+    probe: () => ctx.probe.active,
     onChange: (change) => {
-      if (change.kind === 'phase') return broadcast();
+      if (change.kind === 'phase') {
+        broadcast();
+        return notifyChange();
+      }
       broadcastHost();
       for (const s of vote.sockets.values()) {
         if (s.data.personId === change.voterId) s.emit('state', engine.voteSnapshot(s.data.personId));
@@ -96,8 +113,27 @@ export function registerGame(ns: { host: HostNamespace; vote: VoteNamespace }, c
     engine.dispose();
     engine.resume();
     broadcast();
+    notifyChange();
   };
   ctx.stateEvents.on('changed', onExternalChange);
+
+  // Real phones are unknown to the test-run database and known again after it (R83).
+  const onWorldSwitch = () => {
+    for (const s of vote.sockets.values()) s.data.personId = cookiePersonId(s);
+  };
+  ctx.stateEvents.on('world', onWorldSwitch);
+
+  /** Shared by phones and test-run bots; `null` when the reaction went out. */
+  const sendReaction = (throttleKey: string, personId: PersonId | null, emoji: ReactionEmoji): ErrorCode | null => {
+    const phase = engine.phase();
+    if (phase !== 'presenting' && phase !== 'countdown') return 'WRONG_PHASE';
+    if (!reactions.take(throttleKey)) return 'RATE_LIMITED';
+    const at = Date.now();
+    host.emit('reaction', { id: randomUUID(), emoji, personId, at });
+    const combo = combos.add(emoji, at);
+    if (combo) host.emit('reaction:combo', combo);
+    return null;
+  };
 
   host.on('connection', (socket) => {
     const run = (fn: () => Result) => (ack: unknown) => safeAck(ack)(toAck(fn()));
@@ -133,8 +169,7 @@ export function registerGame(ns: { host: HostNamespace; vote: VoteNamespace }, c
 
   vote.on('connection', (socket) => {
     // D25: the identity comes from the personal login cookie, never from a picked name.
-    const cookiePerson = personSessions.fromCookieHeader(socket.handshake.headers.cookie);
-    socket.data.personId = cookiePerson?.id ?? null;
+    socket.data.personId = cookiePersonId(socket);
     if (socket.data.personId) broadcastHost();
 
     socket.on('state:request', (ack) => safeAck<VoteSnapshot>(ack)({ ok: true, data: engine.voteSnapshot(socket.data.personId) }));
@@ -143,7 +178,7 @@ export function registerGame(ns: { host: HostNamespace; vote: VoteNamespace }, c
       const p = parse(IdentifyPayloadSchema, payload);
       if (!p) return reject(ack, 'INVALID_PAYLOAD');
       if (p.personId && !ctx.repos.persons.get(p.personId)) return reject(ack, 'UNKNOWN_PERSON');
-      if (p.personId && p.personId !== cookiePerson?.id) return reject(ack, 'NOT_IDENTIFIED');
+      if (p.personId && p.personId !== cookiePersonId(socket)) return reject(ack, 'NOT_IDENTIFIED');
       socket.data.personId = p.personId;
       safeAck(ack)({ ok: true });
       socket.emit('state', engine.voteSnapshot(socket.data.personId));
@@ -159,13 +194,8 @@ export function registerGame(ns: { host: HostNamespace; vote: VoteNamespace }, c
     socket.on('reaction:send', (payload, ack) => {
       const p = parse(ReactionPayloadSchema, payload);
       if (!p) return reject(ack, 'INVALID_PAYLOAD');
-      const phase = engine.phase();
-      if (phase !== 'presenting' && phase !== 'countdown') return reject(ack, 'WRONG_PHASE');
-      if (!reactions.take(socket.id)) return reject(ack, 'RATE_LIMITED');
-      const at = Date.now();
-      host.emit('reaction', { id: randomUUID(), emoji: p.emoji, personId: socket.data.personId, at });
-      const combo = combos.add(p.emoji, at);
-      if (combo) host.emit('reaction:combo', combo);
+      const error = sendReaction(socket.id, socket.data.personId, p.emoji);
+      if (error) return reject(ack, error);
       safeAck(ack)({ ok: true });
     });
 
@@ -177,8 +207,31 @@ export function registerGame(ns: { host: HostNamespace; vote: VoteNamespace }, c
     socket.emit('state', engine.voteSnapshot(socket.data.personId));
   });
 
-  return () => {
-    ctx.stateEvents.off('changed', onExternalChange);
-    engine.dispose();
+  const bots: BotGame = {
+    setBotIds(ids) {
+      botIds = ids;
+      broadcastHost();
+    },
+    snapshot: () => engine.voteSnapshot(null),
+    castVote(personId, payload) {
+      engine.castVote(personId, payload);
+    },
+    react(personId, emoji) {
+      sendReaction(`bot:${personId}`, personId, emoji);
+    },
+    onChange(listener) {
+      changeListeners.add(listener);
+      return () => changeListeners.delete(listener);
+    },
+  };
+
+  return {
+    bots,
+    dispose() {
+      ctx.stateEvents.off('changed', onExternalChange);
+      ctx.stateEvents.off('world', onWorldSwitch);
+      changeListeners.clear();
+      engine.dispose();
+    },
   };
 }

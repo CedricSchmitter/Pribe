@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { FinaleShow } from '../../components/finale';
 import { ConnectionBadge } from '../../components/ConnectionBadge';
 import { LoginForm } from '../../components/LoginForm';
+import { ProbeBanner } from '../../components/ProbeBanner';
 import { PhaseWipe } from '../../fx';
 import { useAuth } from '../../lib/auth';
 import { useShellHidden, useToast } from '../../shell';
@@ -83,6 +84,7 @@ export function HostPage() {
         </motion.div>
       </AnimatePresence>
       <PhaseWipe trigger={phase} />
+      {s.probe && <ProbeBanner size="large" />}
       {game.status !== 'connected' && (
         <div className="host-offline">
           <ConnectionBadge status={game.status} />

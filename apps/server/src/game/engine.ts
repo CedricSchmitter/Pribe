@@ -46,6 +46,8 @@ export interface GameEngineDeps {
   /** HMAC comparison (D05); see security/hmac.ts. */
   isOwner(personId: PersonId, ownerHash: string): boolean;
   rng?: Rng;
+  /** R83: whether the repositories currently point at the test-run database. */
+  probe?: () => boolean;
   /**
    * Called after every state change, including the countdown timer firing. `vote` changes
    * only touch the host's `votedPersonIds` and the voter's own `myVote`.
@@ -282,6 +284,7 @@ export class GameEngine {
       roundCount: rounds.length,
       reveal: this.revealResult(round),
       finale: this.finale(),
+      probe: this.deps.probe?.() ?? false,
       round,
     };
   }

@@ -56,6 +56,21 @@ export function SoonWaiting({ presenter, drawing }: { presenter: Person | null; 
   );
 }
 
+/** R83: real phones wait while the admin tests the beamer with bots. */
+export function ProbeWaiting() {
+  return (
+    <div className="vote-page center vote-waiting">
+      <FloatingEmojis emojis={['🤖', '🧪', '👾', '🔧']} count={10} seed={7} />
+      <motion.div className="vote-spinner" animate={{ rotate: [-12, 12, -12] }} transition={{ ...BOUNCE, duration: 0.9 }}>
+        🧪
+      </motion.div>
+      <h1>Probelauf läuft – gleich geht's los</h1>
+      <p className="muted">Die Spielleitung testet gerade Beamer und Technik mit Bots. Danach bist du automatisch dabei.</p>
+      <Dots />
+    </div>
+  );
+}
+
 function Dots() {
   return (
     <div className="vote-dots" aria-hidden>

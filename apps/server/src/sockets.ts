@@ -45,14 +45,15 @@ export function createSocketServer(httpServer: HttpServer, ctx: AppContext) {
     next();
   });
 
-  const disposeGame = registerGame({ host, vote }, ctx);
+  const game = registerGame({ host, vote }, ctx);
 
   return {
     io,
     host,
     vote,
+    bots: game.bots,
     async close() {
-      disposeGame();
+      game.dispose();
       await io.close();
     },
   };
