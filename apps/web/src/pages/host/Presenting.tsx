@@ -77,7 +77,7 @@ export function Presenting({ game, onError }: { game: HostGame; onError(msg: str
         </div>
       )}
       {round.timeLimitEndsAt && round.startedAt && <TimeBar startedAt={round.startedAt} endsAt={round.timeLimitEndsAt} now={game.now} />}
-      <ReactionOverlay reactions={game.reactions} person={game.person} />
+      <ReactionOverlay reactions={game.reactions} combo={game.combo} person={game.person} />
       {curtain && <Curtain />}
       <div className="host-presenting-controls">
         {round.timeLimitEndsAt && !soundOn && (

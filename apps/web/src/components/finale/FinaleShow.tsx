@@ -4,6 +4,7 @@ import { AWARD_KINDS, AWARD_LABELS_DE, type AwardKind, type FinaleResult, type L
 import { AWARD_EMOJI, AWARD_NOBODY, FinaleAvatar, awardDetail, fireworks, statsOf } from './common';
 import { emojiBurst, emojiRain, flash, shake, Spotlights, Sunburst } from '../../fx';
 import { GuessNetwork } from './GuessNetwork';
+import { PhotoWall } from './PhotoWall';
 import './finale.css';
 
 export type FinaleStation =
@@ -13,7 +14,7 @@ export type FinaleStation =
   | { kind: 'award'; award: AwardKind }
   | { kind: 'network' }
   | { kind: 'best' }
-  | { kind: 'end' };
+  | { kind: 'wall' };
 
 function podiumGroups(board: LeaderboardEntry[]): LeaderboardEntry[][] {
   // Ranks are competition ranks, so ties put several people on one step.
@@ -30,7 +31,8 @@ export function stationsFor(f: FinaleResult): FinaleStation[] {
     ...AWARD_KINDS.map((award) => ({ kind: 'award', award }) as const),
     { kind: 'network' },
     { kind: 'best' },
-    { kind: 'end' },
+    // Thank-you page with the photo wall (R86).
+    { kind: 'wall' },
   ];
 }
 
@@ -102,7 +104,7 @@ export function FinaleShow({
             </div>
           )}
           {station.kind === 'best' && <Best finale={finale} person={person} />}
-          {station.kind === 'end' && <End onRestart={() => setStep(0)} />}
+          {station.kind === 'wall' && <PhotoWall persons={persons} onRestart={() => setStep(0)} />}
         </motion.div>
       </AnimatePresence>
       <div className="finale-controls">
@@ -396,24 +398,6 @@ function Best({ finale, person }: { finale: FinaleResult; person(id: PersonId | 
           })}
         </div>
       )}
-    </div>
-  );
-}
-
-function End({ onRestart }: { onRestart(): void }) {
-  useEffect(() => {
-    fireworks(['#ffd000', '#73d95f', '#ff7070', '#2779c4', '#ffffff'], 8000);
-  }, []);
-  return (
-    <div className="finale-center">
-      <motion.div className="finale-trophy" animate={{ rotate: [0, 360], scale: [1, 1.3, 1] }} transition={{ repeat: Infinity, duration: 2.5 }}>
-        🎉
-      </motion.div>
-      <h1 className="finale-hero">Danke fürs Mitspielen!</h1>
-      <p className="finale-sub">Pribe · PowerPoint-Karaoke mit Ratespiel</p>
-      <button type="button" className="host-big-button" onClick={onRestart}>
-        🔁 Finale nochmal von vorn
-      </button>
     </div>
   );
 }

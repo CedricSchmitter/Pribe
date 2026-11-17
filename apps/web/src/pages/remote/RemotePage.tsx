@@ -37,8 +37,8 @@ export function stationLabel(station: FinaleStation): string {
       return 'Tipp-Netz';
     case 'best':
       return 'Beste Präsentation';
-    case 'end':
-      return 'Ende';
+    case 'wall':
+      return 'Foto-Wand (Ende)';
     // Q3 adds finale stations in parallel; an unknown one still gets a readable label.
     default:
       return (station as { kind: string }).kind;

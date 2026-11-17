@@ -103,6 +103,40 @@ describe('state machine', () => {
   });
 });
 
+describe('talk rating (R84)', () => {
+  it('the presenter cannot rate their own talk; the owner’s talk stars count, their slide stars do not', () => {
+    const owner = playToCountdown(w);
+    const other = Object.values(w.p).find((x) => x.id !== owner.id && x.id !== w.p.dan.id)!;
+    const roundId = w.engine.currentRound()!.id;
+
+    expect(w.engine.castVote(w.p.dan.id, { roundId, talkStars: 5 })).toEqual({ ok: false, error: 'CANNOT_RATE_SELF' });
+    expect(w.engine.castVote(w.p.dan.id, { roundId, stars: 3, talkStars: null }).ok).toBe(true);
+    expect(w.engine.castVote(owner.id, { roundId, stars: 5, talkStars: 1 })).toEqual({
+      ok: true,
+      data: { roundId, guessPersonId: null, stars: 5, talkStars: 1 },
+    });
+    expect(w.engine.castVote(other.id, { roundId, stars: 1, talkStars: 4 }).ok).toBe(true);
+    // Changeable like the other stars; a partial update keeps the slide stars.
+    expect(w.engine.castVote(other.id, { roundId, talkStars: 5 })).toMatchObject({ ok: true, data: { stars: 1, talkStars: 5 } });
+    expect(w.engine.voteSnapshot(other.id).myVote).toMatchObject({ talkStars: 5 });
+
+    w.engine.closeRound();
+    vi.advanceTimersByTime(20_000);
+    const reveal = w.engine.hostSnapshot([]).reveal!;
+    expect(reveal).toMatchObject({ avgStars: 2, ratingCount: 2, avgTalkStars: 3, talkRatingCount: 2 });
+  });
+
+  it('the presenter’s talk stars never count, even if stored', () => {
+    const owner = playToCountdown(w);
+    const roundId = w.engine.currentRound()!.id;
+    w.repos.votes.upsert({ roundId, voterId: w.p.dan.id, talkStars: 5 });
+    w.engine.castVote(owner.id, { roundId, talkStars: 2 });
+    w.engine.closeRound();
+    vi.advanceTimersByTime(20_000);
+    expect(w.engine.hostSnapshot([]).reveal).toMatchObject({ avgTalkStars: 2, talkRatingCount: 1 });
+  });
+});
+
 describe('voting and scoring', () => {
   it('accepts changes until the countdown ends, then closes', () => {
     playToCountdown(w);
@@ -110,7 +144,7 @@ describe('voting and scoring', () => {
     expect(w.engine.castVote(w.p.ben.id, { roundId, guessPersonId: w.p.anna.id })).toMatchObject({ ok: true });
     expect(w.engine.castVote(w.p.ben.id, { roundId, stars: 4 })).toEqual({
       ok: true,
-      data: { roundId, guessPersonId: w.p.anna.id, stars: 4 },
+      data: { roundId, guessPersonId: w.p.anna.id, stars: 4, talkStars: null },
     });
     w.engine.closeRound();
     vi.advanceTimersByTime(19_999);
@@ -131,8 +165,8 @@ describe('voting and scoring', () => {
 
     const ownerAck = w.engine.castVote(owner.id, { roundId, guessPersonId: owner.id, stars: 5 });
     const otherAck = w.engine.castVote(other.id, { roundId, guessPersonId: owner.id, stars: 5 });
-    expect(ownerAck).toEqual({ ok: true, data: { roundId, guessPersonId: owner.id, stars: 5 } });
-    expect(otherAck).toEqual({ ok: true, data: { roundId, guessPersonId: owner.id, stars: 5 } });
+    expect(ownerAck).toEqual({ ok: true, data: { roundId, guessPersonId: owner.id, stars: 5, talkStars: null } });
+    expect(otherAck).toEqual({ ok: true, data: { roundId, guessPersonId: owner.id, stars: 5, talkStars: null } });
 
     const strip = (s: ReturnType<GameEngine['voteSnapshot']>) => ({ ...s, me: null });
     expect(strip(w.engine.voteSnapshot(owner.id))).toEqual(strip(w.engine.voteSnapshot(other.id)));
@@ -214,7 +248,7 @@ describe('persistence', () => {
     const db = openDatabase(file);
     const engine = makeEngine(db);
     expect(engine.phase()).toBe('countdown');
-    expect(engine.voteSnapshot(w.p.dan.id).myVote).toEqual({ roundId, guessPersonId: owner.id, stars: 4 });
+    expect(engine.voteSnapshot(w.p.dan.id).myVote).toEqual({ roundId, guessPersonId: owner.id, stars: 4, talkStars: null });
     engine.resume();
     vi.advanceTimersByTime(14_999);
     expect(engine.phase()).toBe('countdown');

@@ -527,6 +527,16 @@
   font-size: 2.4em;
 }
 
+.host-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.host-rating .label {
+  font-size: 1em;
+}
+
 .host-avg {
   display: block;
   font-family: var(--font-bold);

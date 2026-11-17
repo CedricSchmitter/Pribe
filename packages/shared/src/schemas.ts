@@ -67,6 +67,8 @@ export const CastVotePayloadSchema = z.object({
   roundId: z.number().int().positive(),
   guessPersonId: PersonIdSchema.nullable().optional(),
   stars: z.number().int().min(STARS_MIN).max(STARS_MAX).nullable().optional(),
+  /** R84: rating of the talk; the presenter cannot rate themselves. */
+  talkStars: z.number().int().min(STARS_MIN).max(STARS_MAX).nullable().optional(),
 });
 export type CastVotePayload = z.infer<typeof CastVotePayloadSchema>;
 

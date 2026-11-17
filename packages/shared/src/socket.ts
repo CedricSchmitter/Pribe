@@ -19,6 +19,18 @@ export interface ReactionEvent {
   at: EpochMs;
 }
 
+/** R85: at least `COMBO_THRESHOLD` equal emojis within `COMBO_WINDOW_MS`, from all phones together. */
+export interface ComboEvent {
+  /** Stays the same while the streak goes on, so the host updates one effect instead of stacking. */
+  id: string;
+  emoji: ReactionEmoji;
+  count: number;
+  at: EpochMs;
+}
+
+export const COMBO_THRESHOLD = 5;
+export const COMBO_WINDOW_MS = 3000;
+
 export interface WheelSpunEvent {
   candidateIds: PersonId[];
   presenterId: PersonId;
@@ -49,6 +61,7 @@ export interface HostServerToClientEvents {
   /** Full state after every change and after (re)connect. */
   state: (snapshot: HostSnapshot) => void;
   reaction: (event: ReactionEvent) => void;
+  'reaction:combo': (event: ComboEvent) => void;
   'wheel:spun': (event: WheelSpunEvent) => void;
 }
 

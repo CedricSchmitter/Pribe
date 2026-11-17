@@ -22,6 +22,7 @@ export const ERROR_CODES = [
   'INVALID_INVITE_CODE',
   'NAME_TAKEN',
   'UNSUPPORTED_IMAGE',
+  'CANNOT_RATE_SELF',
   /** R87: too many wrong admin passwords from this IP; the message names the remaining time. */
   'LOGIN_LOCKED',
 ] as const;
@@ -50,6 +51,7 @@ export const ERROR_MESSAGES_DE: Record<ErrorCode, string> = {
   INVALID_INVITE_CODE: 'Der Einladungscode stimmt nicht.',
   NAME_TAKEN: 'Diesen Namen gibt es schon.',
   UNSUPPORTED_IMAGE: 'Bitte ein Foto (JPEG, PNG oder WebP) bis 512 KB.',
+  CANNOT_RATE_SELF: 'Den eigenen Vortrag bewertest du nicht 😉',
   LOGIN_LOCKED: 'Zu viele Fehlversuche. Bitte später erneut versuchen.',
 };
 

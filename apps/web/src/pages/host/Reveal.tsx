@@ -20,7 +20,25 @@ function celebrate(colors: string[], emoji: string | undefined) {
   }
 }
 
-function Stars({ avg }: { avg: number }) {
+function Rating({ title, avg, count, delay = 0 }: { title: string; avg: number | null; count: number; delay?: number }) {
+  return (
+    <div className="host-rating">
+      <span className="label">{title}</span>
+      {avg === null ? (
+        <span className="muted">Keine Sterne vergeben</span>
+      ) : (
+        <>
+          <Stars avg={avg} delay={delay} />
+          <span className="host-avg">
+            Ø {avg.toFixed(1)} <span className="muted">({count})</span>
+          </span>
+        </>
+      )}
+    </div>
+  );
+}
+
+function Stars({ avg, delay = 0 }: { avg: number; delay?: number }) {
   return (
     <span className="host-stars">
       {[1, 2, 3, 4, 5].map((i) => (
@@ -28,7 +46,7 @@ function Stars({ avg }: { avg: number }) {
           key={i}
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.6 + i * 0.15, type: 'spring', stiffness: 260 }}
+          transition={{ delay: delay + 0.6 + i * 0.15, type: 'spring', stiffness: 260 }}
           style={{ opacity: avg >= i - 0.5 ? 1 : 0.2 }}
         >
           ⭐
@@ -43,6 +61,7 @@ export function Reveal({ game, onError }: { game: HostGame; onError(msg: string)
   const reveal = snap.reveal!;
   const [stage, setStage] = useState<Stage>('tally');
   const owner = game.person(reveal.ownerId);
+  const presenter = game.person(reveal.presenterId);
   const tally = [...reveal.tally].sort((a, b) => a.count - b.count);
   const max = Math.max(1, ...tally.map((t) => t.count));
   const tallyMs = 1200 + tally.length * 500;
@@ -148,18 +167,13 @@ export function Reveal({ game, onError }: { game: HostGame; onError(msg: string)
               {owner ? owner.name : 'Unbekannt'}!
             </motion.h1>
             <div className="host-owner-stats">
-              <div>
-                {reveal.avgStars === null ? (
-                  <span className="muted">Keine Sterne vergeben</span>
-                ) : (
-                  <>
-                    <Stars avg={reveal.avgStars} />
-                    <span className="host-avg">
-                      Ø {reveal.avgStars.toFixed(1)} <span className="muted">({reveal.ratingCount})</span>
-                    </span>
-                  </>
-                )}
-              </div>
+              <Rating title="Folien" avg={reveal.avgStars} count={reveal.ratingCount} />
+              <Rating
+                title={`Vortrag${presenter ? ` von ${presenter.name}` : ''}`}
+                avg={reveal.avgTalkStars ?? null}
+                count={reveal.talkRatingCount ?? 0}
+                delay={0.9}
+              />
               <div className="host-correct">
                 <span className="label">Richtig getippt: {reveal.correctVoterIds.length}</span>
                 <div className="row">

@@ -6,8 +6,22 @@ export function countingVotes(votes: VoteRecord[], ownerId: PersonId | null): Vo
   return votes.filter((v) => v.voterId !== ownerId);
 }
 
+/**
+ * Talk stars that count (R84): everyone's but the presenter's own. Unlike guess and slide
+ * stars, the owner's talk stars count — rating someone else's talk reveals nothing.
+ */
+export function countingTalkStars(votes: VoteRecord[], presenterId: PersonId | null): number[] {
+  return votes
+    .filter((v) => v.voterId !== presenterId)
+    .map((v) => v.talkStars ?? null)
+    .filter((s): s is number => s !== null);
+}
+
+export const average = (xs: number[]): number | null => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
+
 export function computeReveal(round: RoundRecord, votes: VoteRecord[], ownerId: PersonId): RevealResult {
   const counting = countingVotes(votes, ownerId);
+  const talk = countingTalkStars(votes, round.presenterId);
   const tallyMap = new Map<PersonId, number>();
   for (const v of counting) {
     if (v.guessPersonId) tallyMap.set(v.guessPersonId, (tallyMap.get(v.guessPersonId) ?? 0) + 1);
@@ -22,8 +36,10 @@ export function computeReveal(round: RoundRecord, votes: VoteRecord[], ownerId: 
     presenterId: round.presenterId ?? '',
     tally,
     correctVoterIds: counting.filter((v) => v.guessPersonId === ownerId).map((v) => v.voterId),
-    avgStars: ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : null,
+    avgStars: average(ratings),
     ratingCount: ratings.length,
+    avgTalkStars: average(talk),
+    talkRatingCount: talk.length,
   };
 }
 

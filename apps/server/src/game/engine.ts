@@ -15,7 +15,7 @@ import {
   type VoteSnapshot,
   type WheelSpunEvent,
 } from '@pribe/shared';
-import { transaction, type Db, type Repositories, type RoundRecord, type SubmissionRecord } from '../db';
+import { transaction, type Db, type Repositories, type RoundRecord, type SubmissionRecord, type VoteRecord } from '../db';
 import { chooseForPresenter, chooseWheel, eligiblePresenters, isValidChoice, type DrawInput, type PoolItem, type Rng } from './draw';
 import { computeFinale } from './finale';
 import { computeLeaderboard, computeReveal, outcomeFor } from './scoring';
@@ -24,6 +24,13 @@ export type Result<T = void> = { ok: true; data: T } | { ok: false; error: Error
 
 const ok = <T>(data: T): Result<T> => ({ ok: true, data });
 const fail = (error: ErrorCode): { ok: false; error: ErrorCode } => ({ ok: false, error });
+
+const toMyVote = (v: VoteRecord): MyVote => ({
+  roundId: v.roundId,
+  guessPersonId: v.guessPersonId,
+  stars: v.stars,
+  talkStars: v.talkStars ?? null,
+});
 
 /** Persisted in `game.state_json`; everything else is derived from rounds and votes. */
 export interface GameState {
@@ -203,14 +210,16 @@ export class GameEngine {
     }
     if (round.countdownEndsAt !== null && now >= round.countdownEndsAt) return fail('VOTING_CLOSED');
     if (payload.guessPersonId && !this.repos.persons.get(payload.guessPersonId)) return fail('INVALID_GUESS');
+    if (payload.talkStars != null && voterId === round.presenterId) return fail('CANNOT_RATE_SELF');
     const v = this.repos.votes.upsert({
       roundId: round.id,
       voterId,
       guessPersonId: payload.guessPersonId,
       stars: payload.stars,
+      talkStars: payload.talkStars,
     });
     this.deps.onChange?.({ kind: 'vote', voterId });
-    return ok({ roundId: v.roundId, guessPersonId: v.guessPersonId, stars: v.stars });
+    return ok(toMyVote(v));
   }
 
   // ---- Timers ----
@@ -311,9 +320,7 @@ export class GameEngine {
   voteSnapshot(me: PersonId | null, now = Date.now()): VoteSnapshot {
     const { round, ...base } = this.base(now);
     const vote = round && me ? this.repos.votes.get(round.id, me) : null;
-    const myVote: MyVote | null = vote
-      ? { roundId: vote.roundId, guessPersonId: vote.guessPersonId, stars: vote.stars }
-      : null;
+    const myVote: MyVote | null = vote ? toMyVote(vote) : null;
     return {
       ...base,
       role: 'vote',
