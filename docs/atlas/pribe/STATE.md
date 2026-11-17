@@ -5,7 +5,7 @@ keep it scannable in one read (curate, don't accrete). Resolved detail moves dow
 LOG.md. Map symbols: `[ ]` open · `[~]` in progress · `[x]` done · ♻️ possibly stale
 (code changed) · ⏭️ dropped (with reason).
 
-Updated: 2026-11-17 · session 2 (Orchestrator) · drift-anchor: git `main` @ a8a94c6
+Updated: 2026-11-17 · session 2 (Orchestrator) · drift-anchor: git `main` @ 7e053f7 (origin/main)
 
 ## Mental model
 Pribe ist PowerPoint-Karaoke mit Ratespiel: Jeder reicht vorher anonym eine Präsentation
@@ -70,10 +70,20 @@ sie lokal per `git merge --no-ff` nach `main` (Nutzer-Freigabe). Nur der Orchest
 - `.env` liegt im Repo-Root und ist gitignored; dort steht das generierte `ADMIN_PASSWORD`.
 - Demo-Daten: 8 Personen, Passwort `demo`, Einladungscode `PRIBE-DEMO`.
 
-## Next concrete action
-1. **Gemeinsamer lokaler Test mit dem Nutzer**: Checkliste aus dem Abschlussbericht; Fehler gehen an Fix-Sessions.
-2. Danach **L11 Generalprobe**: Der Kollege beantwortet die Fragen in `docs/betrieb.md`, baut das Image auf dem Pi und richtet Domain und Proxy ein. Dann 3–4 Leute mit echten iPhones und Android über die Domain, PowerPoint am Beamer-Rechner, Abnahme gegen die „Definition of done“.
+## Welle 2 (R80–R89, D30) — Orchestrator merged lokal, Push nach github.com am Ende (Nutzer meldet sich kurz an, D29)
+| Paket | Inhalt | Ports | wartet auf | Stand |
+|---|---|---|---|---|
+| Q1 Admin-Sicherheit + Reset | R87, R88 | 4111/4211 | – | läuft |
+| Q2 Submit-Vorschau | R81 | 4112/4212 | – | läuft |
+| Q3 Show-Extras | R84 Vortrags-Bewertung + Rampensau, R85 Emoji-Combo, R86 Foto-Wand | 4113/4213 | – | läuft |
+| Q4 Fernbedienung + „Du präsentierst!“ | R80, R82 | 4114/4214 | – | läuft |
+| Q5 Probelauf-Modus | R83 | 4115/4215 | Q1, Q3 | wartet |
+| Q6 Code-Splitting + Gesamttest-Update | R89, E2E/Demo um Welle 2 erweitern | 4116/4216 | alle | wartet |
 
+## Next concrete action
+Berichte von Q1–Q4 abwarten. Pro Bericht: Gate-Subagent, `git merge --no-ff`, Nachprüfung, abhaken.
+Nach Q1+Q3 Q5 freigeben, danach Q6. Am Ende App neu bauen und starten, Nutzer für den
+Push um den temporären github.com-Login bitten, dann L11 Generalprobe.
 ## Terrain (working set)
 - `docs/atlas/pribe/` — Missionsgedächtnis (CHARTER = R.., DECISIONS = D.., DESIGN = Optik/Shell)
 - `apps/server/src/` — `game/` (Echtzeit), `conversion/` (PPTX-Bereinigung), `routes/` (admin, submit, person, files, host), `db/`

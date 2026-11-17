@@ -226,3 +226,18 @@ in the chat is already lost.
 - **Why:** Nutzerwahl („alles raus nehmen, was blöd ist, und als initial ohne Git-Historie pushen“).
 - **Alternatives rejected:** Repo privat stellen; Historie umschreiben.
 - **Affects:** Arbeitsweise. Künftig gibt es ein Remote, Commits gehen mit der noreply-Adresse auf github.com.
+
+## D30 — Welle 2: Auswahl und Annahmen · 2026-11-17
+- **Context:** Nach dem ersten gemeinsamen Test („es war funny“) hat der Nutzer aus der Ideenliste gewählt.
+- **Decision:**
+  - Rein: Fernbedienung, Vorschau beim Einreichen, „Du präsentierst!“, Probelauf, Vortrags-Bewertung, Emoji-Combo, Foto-Wand, Login-Sperre, drei Reset-Wege und Code-Splitting (R80–R89).
+  - Nicht gewählt: Erinnerung an fehlende Einreichungen, Zwischenstand, Challenge-Karten, Reroll-Joker, Sound-Effekte.
+  - Annahmen des Orchestrators:
+    - `/remote` nutzt das Admin-Passwort.
+    - Login-Sperre: 5 Fehlversuche pro IP → 15 min.
+    - Emoji-Combo: mindestens 5 gleiche Emojis in 3 s.
+    - „Alles löschen“ behält die Einstellungen (Einladungscode, Fristen) und verlangt eine Bestätigung durch Eintippen.
+    - Foto-Wand nur als Station, ohne Download.
+    - Der Probelauf läuft in einer getrennten Datenbank (temporär) mit Server-Bots.
+- **Alternatives rejected:** siehe „nicht gewählt“.
+- **Affects:** R80–R89.

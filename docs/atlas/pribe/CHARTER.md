@@ -123,6 +123,30 @@ IDs (R..) werden in STATE.md und DECISIONS.md referenziert.
 - **R72** Anleitung für den Kollegen: Start, Update, Backup, Reverse Proxy (HTTPS,
   WebSocket-Upgrade, Upload-Limit ≥ 100 MB).
 
+### Welle 2 (nach dem ersten gemeinsamen Test, 2026-11-17, D30)
+- **R80** Fernbedienung `/remote` am Handy (Admin-Passwort): Präsentator wählen/Rad,
+  Ziehen, Schließen, Weiter/Zurück im Finale — damit PPTX-Runden ohne Wechsel zwischen
+  PowerPoint und Browser laufen. Zeigt Timer und Phase.
+- **R81** Vorschau beim Einreichen: Nach dem Upload sieht man die eigene HTML-Datei in
+  einem Sandbox-iframe bzw. bei PPTX die Folienzahl (nur die eigene, nur eingeloggt).
+- **R82** „Du präsentierst!“: Das Handy der gerade präsentierenden Person zeigt das groß
+  (inkl. Restzeit); die Tarnung der *einreichenden* Person (R52) bleibt unberührt.
+- **R83** Probelauf-Modus: Der Admin startet ein Testspiel mit Bots, das die echten Daten
+  (Personen, Einreichungen, Spielstand) nicht verändert; zum Testen von Beamer, Gong und
+  PowerPoint-Öffnen.
+- **R84** Vortrags-Bewertung: Neben den Folien-Sternen 1–5 ⭐ für den Vortrag der
+  präsentierenden Person; ihre eigene Bewertung zählt nicht. Ø in der Auflösung, im Finale
+  der Award „Rampensau“ (höchster Ø).
+- **R85** Emoji-Combo: Schicken viele gleichzeitig dasselbe Emoji, gibt es auf dem Beamer
+  einen Riesen-Effekt.
+- **R86** Foto-Wand: Station im Finale mit allen Avataren als animierte Collage
+  („Danke fürs Mitmachen“).
+- **R87** Admin-Login mit Sperre nach mehreren Fehlversuchen.
+- **R88** Drei Reset-Wege im Admin: *Spiel zurücksetzen* (wie frisch gestartet: Runden,
+  Votes, Spielstand; Personen, Einreichungen, Themen bleiben), *Themen zurücksetzen*,
+  *Alles löschen* (zusätzlich Personen, Einreichungen, Dateien, Avatare, Themen).
+- **R89** Frontend in Teilen laden (Code-Splitting pro Seite).
+
 ## OUT OF SCOPE
 - Echte Logins für Spieler; echte Anonymität gegenüber jemandem mit Zugriff auf DB **und**
   Secret (HMAC über eine kleine bekannte Namensliste ist Sichtschutz, kein Geheimnis).
