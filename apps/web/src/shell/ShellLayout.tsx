@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { NavLink, Outlet, useLocation } from 'react-router';
 import { useAuth } from '../lib/auth';
-import { AdminIcon, BeamerIcon, LockIcon, MenuIcon, MoonIcon, SunIcon, UploadIcon, VoteIcon } from './icons';
+import { AdminIcon, BeamerIcon, LockIcon, MenuIcon, MoonIcon, RemoteIcon, SunIcon, UploadIcon, VoteIcon } from './icons';
 import { useShell, type ShellAvatar } from './ShellContext';
 import { useTheme } from './theme';
 import './shell.css';
@@ -35,7 +35,7 @@ export function ShellLayout() {
   const [expanded, setExpanded] = useState(readRailExpanded);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const adminArea = pathname.startsWith('/admin') || pathname.startsWith('/host');
+  const adminArea = pathname.startsWith('/admin') || pathname.startsWith('/host') || pathname.startsWith('/remote');
   const shownAvatar = adminArea ? (authenticated ? ADMIN_AVATAR : null) : avatar;
   const locked = authenticated !== true;
 
@@ -43,6 +43,7 @@ export function ShellLayout() {
     { to: '/submit', label: 'Einreichen', icon: <UploadIcon /> },
     { to: '/vote', label: 'Abstimmen', icon: <VoteIcon /> },
     { to: '/host', label: 'Beamer', icon: <BeamerIcon />, locked },
+    { to: '/remote', label: 'Fernbedienung', icon: <RemoteIcon />, locked },
     { to: '/admin', label: 'Admin', icon: <AdminIcon />, locked },
   ];
 

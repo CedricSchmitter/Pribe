@@ -6,7 +6,7 @@ import { emojiBurst, emojiRain, flash, shake, Spotlights, Sunburst } from '../..
 import { GuessNetwork } from './GuessNetwork';
 import './finale.css';
 
-type Station =
+export type FinaleStation =
   | { kind: 'intro' }
   | { kind: 'board' }
   | { kind: 'podium'; reveal: number }
@@ -15,14 +15,13 @@ type Station =
   | { kind: 'best' }
   | { kind: 'end' };
 
-const STEP_KEY = 'pribe-finale-step';
-
 function podiumGroups(board: LeaderboardEntry[]): LeaderboardEntry[][] {
   // Ranks are competition ranks, so ties put several people on one step.
   return [3, 2, 1].map((rank) => board.filter((e) => e.rank === rank)).filter((g) => g.length > 0);
 }
 
-function stationsFor(f: FinaleResult): Station[] {
+/** Also used by the remote (R80) to show progress and disable "Weiter" at the end. */
+export function stationsFor(f: FinaleResult): FinaleStation[] {
   const groups = podiumGroups(f.leaderboard);
   return [
     { kind: 'intro' },
@@ -35,31 +34,31 @@ function stationsFor(f: FinaleResult): Station[] {
   ];
 }
 
-function readStep(): number {
-  try {
-    return Number(sessionStorage.getItem(STEP_KEY)) || 0;
-  } catch {
-    return 0;
-  }
-}
-
-/** Host finale (R62–R65): the host clicks (or uses →/Space/clicker) through the stations. */
-export function FinaleShow({ finale, persons }: { finale: FinaleResult; persons: Person[] }) {
+/**
+ * Host finale (R62–R65): the host clicks (or uses →/Space/clicker) through the stations.
+ * The station lives on the server so the remote (R80) can drive it too.
+ */
+export function FinaleShow({
+  finale,
+  persons,
+  step: serverStep,
+  onStep,
+}: {
+  finale: FinaleResult;
+  persons: Person[];
+  step: number;
+  onStep(step: number): void;
+}) {
   const stations = stationsFor(finale);
-  const [step, setStep] = useState(() => Math.min(readStep(), stations.length - 1));
-  const station = stations[Math.min(step, stations.length - 1)]!;
+  const step = Math.min(Math.max(serverStep, 0), stations.length - 1);
+  const station = stations[step]!;
   const person = (id: PersonId | null | undefined) => persons.find((p) => p.id === id);
+  const setStep = (s: number) => {
+    if (s !== step) onStep(s);
+  };
 
-  useEffect(() => {
-    try {
-      sessionStorage.setItem(STEP_KEY, String(step));
-    } catch {
-      /* private mode: the finale just restarts on reload */
-    }
-  }, [step]);
-
-  const next = () => setStep((s) => Math.min(s + 1, stations.length - 1));
-  const back = () => setStep((s) => Math.max(s - 1, 0));
+  const next = () => setStep(Math.min(step + 1, stations.length - 1));
+  const back = () => setStep(Math.max(step - 1, 0));
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

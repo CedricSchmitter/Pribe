@@ -4,6 +4,7 @@ import {
   apiError,
   CastVotePayloadSchema,
   DrawPayloadSchema,
+  FinaleStepPayloadSchema,
   IdentifyPayloadSchema,
   ReactionPayloadSchema,
   type Ack,
@@ -57,7 +58,15 @@ export function registerGame(ns: { host: HostNamespace; vote: VoteNamespace }, c
     return [...ids];
   };
 
-  const broadcastHost = () => host.emit('state', engine.hostSnapshot(connectedPersonIds()));
+  // In memory on purpose: a server restart mid-finale just restarts the show at the intro.
+  let finaleStep = 0;
+  const hostSnapshot = (): HostSnapshot => {
+    const snap = engine.hostSnapshot(connectedPersonIds());
+    if (snap.phase !== 'finale') finaleStep = 0;
+    return { ...snap, finaleStep };
+  };
+
+  const broadcastHost = () => host.emit('state', hostSnapshot());
   const broadcastVote = () => {
     for (const s of vote.sockets.values()) s.emit('state', engine.voteSnapshot(s.data.personId));
   };
@@ -91,7 +100,7 @@ export function registerGame(ns: { host: HostNamespace; vote: VoteNamespace }, c
   host.on('connection', (socket) => {
     const run = (fn: () => Result) => (ack: unknown) => safeAck(ack)(toAck(fn()));
 
-    socket.on('state:request', (ack) => safeAck<HostSnapshot>(ack)({ ok: true, data: engine.hostSnapshot(connectedPersonIds()) }));
+    socket.on('state:request', (ack) => safeAck<HostSnapshot>(ack)({ ok: true, data: hostSnapshot() }));
     socket.on('game:start', run(() => engine.start()));
     socket.on('presenter:spin', (ack) => {
       const res = engine.spin();
@@ -108,8 +117,16 @@ export function registerGame(ns: { host: HostNamespace; vote: VoteNamespace }, c
     socket.on('round:close', run(() => engine.closeRound()));
     socket.on('round:next', run(() => engine.next()));
     socket.on('finale:start', run(() => engine.startFinale()));
+    socket.on('finale:step', (payload, ack) => {
+      const p = parse(FinaleStepPayloadSchema, payload);
+      if (!p) return reject(ack, 'INVALID_PAYLOAD');
+      if (engine.phase() !== 'finale') return reject(ack, 'WRONG_PHASE');
+      finaleStep = p.step;
+      broadcastHost();
+      safeAck(ack)({ ok: true });
+    });
 
-    socket.emit('state', engine.hostSnapshot(connectedPersonIds()));
+    socket.emit('state', hostSnapshot());
   });
 
   vote.on('connection', (socket) => {

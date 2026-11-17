@@ -38,6 +38,14 @@ export const BeamerIcon = () => (
   </Icon>
 );
 
+export const RemoteIcon = () => (
+  <Icon>
+    <rect x="7" y="2" width="10" height="20" rx="3" />
+    <circle cx="12" cy="8" r="2" />
+    <path d="M10 14h4M10 17h4" />
+  </Icon>
+);
+
 export const AdminIcon = () => (
   <Icon>
     <circle cx="12" cy="12" r="3" />

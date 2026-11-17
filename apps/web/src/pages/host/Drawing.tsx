@@ -28,6 +28,8 @@ export function Drawing({ game, onError }: { game: HostGame; onError(msg: string
       const res = await game.command('round:start');
       if (!res.ok) {
         fired.current = false;
+        // A second host client (another beamer tab or the remote) already started the round.
+        if (res.error === 'WRONG_PHASE') return;
         return onError(res.message);
       }
       if (round.submission.kind === 'pptx') downloadPptx(round.submission.url);

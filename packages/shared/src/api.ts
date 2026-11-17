@@ -78,7 +78,7 @@ export interface HostInfoDto {
 }
 
 /** Client SPA routes served with the index.html fallback. */
-export const CLIENT_ROUTES = ['/admin', '/submit', '/host', '/vote'] as const;
+export const CLIENT_ROUTES = ['/admin', '/submit', '/host', '/vote', '/remote'] as const;
 
 export const SESSION_COOKIE_NAME = 'pribe_session';
 /** Personal session (D25), separate from the admin cookie (D20). */
