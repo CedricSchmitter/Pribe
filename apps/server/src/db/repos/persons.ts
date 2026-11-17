@@ -52,6 +52,14 @@ export function createPersonsRepo(db: Db) {
     remove(id: PersonId): boolean {
       return db.prepare('DELETE FROM persons WHERE id = ?').run(id).changes > 0;
     },
+    /** Deletes every person; returns their photo file names so the caller can remove the files. */
+    removeAll(): { count: number; photoFiles: string[] } {
+      const rows = db.prepare('SELECT photo_file FROM persons WHERE photo_file IS NOT NULL').all() as unknown as {
+        photo_file: string;
+      }[];
+      const count = Number(db.prepare('DELETE FROM persons').run().changes);
+      return { count, photoFiles: rows.map((r) => r.photo_file) };
+    },
     /** `undefined` = unknown person, `null` = no password set yet (D25). */
     getPasswordHash(id: PersonId): string | null | undefined {
       const row = db.prepare('SELECT password_hash FROM persons WHERE id = ?').get(id) as

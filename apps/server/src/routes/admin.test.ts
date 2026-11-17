@@ -1,7 +1,8 @@
-import { readdirSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { API_PATHS, type Person, type SubmissionOverviewDto, type SubmissionStatusDto } from '@pribe/shared';
 import { HTML, PPTX, setup } from './submit.testkit';
+import { avatarsDir, replacePhoto } from './submitPhoto';
 
 let t: Awaited<ReturnType<typeof setup>>;
 
@@ -23,6 +24,8 @@ describe('guard', () => {
       ['PUT', API_PATHS.admin.settings],
       ['GET', API_PATHS.admin.submissions],
       ['POST', API_PATHS.admin.reset],
+      ['POST', API_PATHS.admin.resetTopics],
+      ['POST', API_PATHS.admin.resetAll],
     ] as const) {
       const res = await t.app.inject({ method, url, payload: {} });
       expect(res.statusCode, `${method} ${url}`).toBe(401);
@@ -103,41 +106,82 @@ describe('submission overview', () => {
   });
 });
 
-describe('reset', () => {
-  async function playOneRound(voter: Person, presenter: Person, submissionId: string) {
-    const round = t.ctx.repos.rounds.create({ presenterId: presenter.id, submissionId });
-    t.ctx.repos.votes.upsert({ roundId: round.id, voterId: voter.id, guessPersonId: presenter.id, stars: 4 });
-    t.ctx.repos.game.save('reveal', { some: 'state' });
-  }
+describe('reset (R88)', () => {
+  const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  const settings = { submissionDeadline: Date.UTC(2026, 11, 1), talkTimeLimitS: 300, voteCountdownS: 15, inviteCode: 'PRIBE' };
 
-  it('deletes rounds and votes, keeps submissions by default', async () => {
+  /** Anna and Ben with photo, topic and submission; one round with a vote. */
+  async function fullEvening() {
     const anna = await t.addPerson('Anna');
     const ben = await t.addPerson('Ben');
-    const sub = (await t.upload(anna.id, 'x.html', HTML)).json() as SubmissionStatusDto;
-    await playOneRound(anna, ben, sub.submissionId);
+    const subs: SubmissionStatusDto[] = [];
+    for (const p of [anna, ben]) {
+      subs.push((await t.upload(p.id, 'x.html', HTML)).json() as SubmissionStatusDto);
+      await replacePhoto(t.ctx, p.id, PNG, 'png');
+      t.ctx.repos.topics.assign(t.ctx.ownerHash(p.id));
+    }
+    await t.admin('PUT', API_PATHS.admin.settings, settings);
+    const round = t.ctx.repos.rounds.create({ presenterId: ben.id, submissionId: subs[0]!.submissionId });
+    t.ctx.repos.votes.upsert({ roundId: round.id, voterId: anna.id, guessPersonId: ben.id, stars: 4 });
+    t.ctx.repos.game.save('reveal', { some: 'state' });
+    return { anna, ben, subs };
+  }
 
-    const res = await t.admin('POST', API_PATHS.admin.reset, { deleteSubmissions: false });
-    expect(res.json()).toEqual({ submissionsDeleted: 0 });
+  const topicCount = (...persons: Person[]) =>
+    persons.filter((p) => t.ctx.repos.topics.get(t.ctx.ownerHash(p.id))).length;
+  const avatars = () => (existsSync(avatarsDir(t.ctx)) ? readdirSync(avatarsDir(t.ctx)) : []);
+
+  it('game reset: back to a fresh lobby, persons, submissions, files and topics stay', async () => {
+    const { anna, ben, subs } = await fullEvening();
+    expect(t.ctx.repos.submissions.listPool()).toHaveLength(1);
+
+    const res = await t.admin('POST', API_PATHS.admin.reset, {});
+    expect(res.json()).toEqual({ rounds: 1, topics: 0, submissions: 0, persons: 0 });
     expect(t.ctx.repos.rounds.list()).toEqual([]);
     expect(t.ctx.repos.votes.listAll()).toEqual([]);
     expect(t.ctx.repos.game.get()).toMatchObject({ phase: 'lobby', state: {} });
-    expect(t.ctx.repos.submissions.list()).toHaveLength(1);
+    expect(t.ctx.repos.submissions.listPool().map((s) => s.id).sort()).toEqual(subs.map((s) => s.submissionId).sort());
     expect(t.ctx.repos.persons.list()).toHaveLength(2);
-    expect(readdirSync(t.ctx.config.filesDir)).toEqual([`${sub.submissionId}.html`]);
+    expect(topicCount(anna, ben)).toBe(2);
+    expect(readdirSync(t.ctx.config.filesDir)).toHaveLength(2);
+    expect(avatars()).toHaveLength(2);
   });
 
-  it('optionally deletes submissions and their files', async () => {
-    const anna = await t.addPerson('Anna');
-    const ben = await t.addPerson('Ben');
-    const sub = (await t.upload(anna.id, 'x.html', HTML)).json() as SubmissionStatusDto;
-    await t.upload(ben.id, 'x.html', HTML);
-    await playOneRound(anna, ben, sub.submissionId);
+  it('topic reset: frees every topic, nothing else changes', async () => {
+    const { anna, ben } = await fullEvening();
 
-    const res = await t.admin('POST', API_PATHS.admin.reset, { deleteSubmissions: true });
-    expect(res.json()).toEqual({ submissionsDeleted: 2 });
+    const res = await t.admin('POST', API_PATHS.admin.resetTopics, {});
+    expect(res.json()).toEqual({ rounds: 0, topics: 2, submissions: 0, persons: 0 });
+    expect(topicCount(anna, ben)).toBe(0);
+    expect(t.ctx.repos.rounds.list()).toHaveLength(1);
+    expect(t.ctx.repos.votes.listAll()).toHaveLength(1);
+    expect(t.ctx.repos.game.get().phase).toBe('reveal');
+    expect(t.ctx.repos.submissions.list()).toHaveLength(2);
+    expect(t.ctx.repos.persons.list()).toHaveLength(2);
+    expect(avatars()).toHaveLength(2);
+  });
+
+  it('delete all: needs the typed confirmation', async () => {
+    await fullEvening();
+    for (const body of [{}, { confirm: 'löschen' }, { confirm: 'JA' }]) {
+      expect((await t.admin('POST', API_PATHS.admin.resetAll, body)).statusCode).toBe(400);
+    }
+    expect(t.ctx.repos.persons.list()).toHaveLength(2);
+  });
+
+  it('delete all: removes persons, submissions, files, photos, topics and the game, keeps settings', async () => {
+    const { anna, ben } = await fullEvening();
+
+    const res = await t.admin('POST', API_PATHS.admin.resetAll, { confirm: 'LÖSCHEN' });
+    expect(res.json()).toEqual({ rounds: 1, topics: 2, submissions: 2, persons: 2 });
+    expect(t.ctx.repos.persons.list()).toEqual([]);
     expect(t.ctx.repos.submissions.list()).toEqual([]);
     expect(t.ctx.repos.rounds.list()).toEqual([]);
+    expect(t.ctx.repos.votes.listAll()).toEqual([]);
+    expect(topicCount(anna, ben)).toBe(0);
+    expect(t.ctx.repos.game.get()).toMatchObject({ phase: 'lobby', state: {} });
     expect(readdirSync(t.ctx.config.filesDir)).toEqual([]);
-    expect(t.ctx.repos.persons.list()).toHaveLength(2);
+    expect(avatars()).toEqual([]);
+    expect((await t.admin('GET', API_PATHS.admin.settings)).json()).toMatchObject(settings);
   });
 });

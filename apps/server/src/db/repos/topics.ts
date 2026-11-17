@@ -40,6 +40,9 @@ export function createTopicsRepo(db: Db) {
     remove(ownerHash: string): boolean {
       return db.prepare('DELETE FROM topic_assignments WHERE owner_hash = ?').run(ownerHash).changes > 0;
     },
+    removeAll(): number {
+      return Number(db.prepare('DELETE FROM topic_assignments').run().changes);
+    },
   };
 }
 export type TopicsRepo = ReturnType<typeof createTopicsRepo>;

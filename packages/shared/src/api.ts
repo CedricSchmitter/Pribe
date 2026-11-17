@@ -18,7 +18,12 @@ export const API_PATHS = {
     personPhoto: (id: string) => `/api/admin/persons/${encodeURIComponent(id)}/photo`,
     settings: '/api/admin/settings',
     submissions: '/api/admin/submissions',
+    /** POST: game reset (R88) — rounds, votes and game state; persons, submissions and topics stay. */
     reset: '/api/admin/reset',
+    /** POST: frees all 18 topics (R88). */
+    resetTopics: '/api/admin/reset/topics',
+    /** POST `ResetAllRequest`: deletes everything except the settings (R88, D30). */
+    resetAll: '/api/admin/reset/all',
   },
   /** Open endpoints for phones (P2). */
   persons: '/api/persons',
@@ -132,8 +137,12 @@ export interface SubmissionOverviewItem {
   status: SubmissionStatus;
 }
 
+/** Deleted row counts of a reset (R88); fields a reset does not touch are 0. */
 export interface ResetResponseDto {
-  submissionsDeleted: number;
+  rounds: number;
+  topics: number;
+  submissions: number;
+  persons: number;
 }
 
 /** Multipart field name of the upload; the uploader comes from the person cookie. */

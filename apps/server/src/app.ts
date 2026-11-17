@@ -37,7 +37,9 @@ export async function buildApp(config: Config, opts: BuildAppOptions = {}) {
   const app = Fastify({
     logger: { level: config.logLevel },
     bodyLimit: 1024 * 1024,
-    trustProxy: true,
+    // Trust only the direct peer (the proxy): the client is the address it appended last, so
+    // entries a client forged further left are ignored. Fastify refuses a plain hop count.
+    trustProxy: config.trustProxy ? (_addr: string, hop: number) => hop === 0 : false,
   });
   await app.register(fastifyCookie);
   await registerRoutes(app, ctx);

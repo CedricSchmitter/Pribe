@@ -13,6 +13,7 @@ const EnvSchema = z.object({
   MAX_UPLOAD_MB: z.coerce.number().positive().default(DEFAULT_MAX_UPLOAD_MB),
   DATA_DIR: z.string().default('./data'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
+  TRUST_PROXY: z.stringbool().default(false),
 });
 
 export interface Config {
@@ -28,6 +29,8 @@ export interface Config {
   dbFile: string;
   logLevel: z.infer<typeof EnvSchema>['LOG_LEVEL'];
   secureCookies: boolean;
+  /** Client IP from `X-Forwarded-For` (last hop); only behind a reverse proxy. */
+  trustProxy: boolean;
 }
 
 export function loadDotEnv(file = ROOT_ENV_FILE): void {
@@ -55,5 +58,6 @@ export function parseConfig(env: NodeJS.ProcessEnv): Config {
     dbFile: path.join(dataDir, 'pribe.sqlite'),
     logLevel: e.LOG_LEVEL,
     secureCookies: e.PUBLIC_URL.startsWith('https://'),
+    trustProxy: e.TRUST_PROXY,
   };
 }
