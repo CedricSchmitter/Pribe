@@ -83,7 +83,7 @@ describe('buildFinale', () => {
 
   it('stats carry the numbers behind the awards', () => {
     const s = Object.fromEntries(f.stats!.map((x) => [x.personId, x]));
-    expect(s.c).toEqual({ personId: 'c', guesses: 2, hits: 1, majorityRounds: 2, withMajority: 2, ownGuessers: null, ownGuessedRight: null });
+    expect(s.c).toEqual({ personId: 'c', guesses: 2, hits: 1, majorityRounds: 2, withMajority: 2, ownGuessers: null, ownGuessedRight: null, talkRatingCount: 0, avgTalkStars: null });
     expect(s.a).toMatchObject({ guesses: 1, hits: 1, ownGuessers: 3, ownGuessedRight: 2 });
     expect(s.e).toMatchObject({ guesses: 0, hits: 0 });
   });
@@ -115,6 +115,7 @@ describe('edge cases', () => {
       ['pokerface', []],
       ['blindgaenger', []],
       ['herdentier', []],
+      ['rampensau', []],
     ]);
     expect(f.guessNetwork).toEqual([]);
     expect(f.bestPresentations).toEqual([]);
@@ -181,5 +182,60 @@ describe('computeBestPresentations', () => {
       1, 2,
     ]);
     expect(computeBestPresentations([summary(1, null, 0)])).toEqual([]);
+  });
+});
+
+describe('Rampensau (R84)', () => {
+  const talk = (roundId: number, voterId: string, talkStars: number): VoteRecord => ({
+    roundId,
+    voterId,
+    guessPersonId: null,
+    stars: null,
+    talkStars,
+    updatedAt: 0,
+  });
+
+  it('highest talk average wins; the presenter’s own stars never count, the owner’s do', () => {
+    const f = buildFinale(
+      persons,
+      [round(1, 'a', 'b'), round(2, 'b', 'c')],
+      // b: a (owner) 5 + c 4 = 4.5; b's own 1 is ignored. c: 4 + 4 = 4.
+      [talk(1, 'a', 5), talk(1, 'c', 4), talk(1, 'b', 1), talk(2, 'a', 4), talk(2, 'd', 4)],
+    );
+    expect(award(f.awards, 'rampensau')).toEqual({ kind: 'rampensau', winners: ['b'], value: 4.5 });
+    expect(f.stats!.find((s) => s.personId === 'b')).toMatchObject({ talkRatingCount: 2, avgTalkStars: 4.5 });
+    expect(f.rounds[0]).toMatchObject({ avgTalkStars: 4.5, talkRatingCount: 2 });
+  });
+
+  it('pools all talks of one presenter and ignores unrevealed rounds', () => {
+    const f = buildFinale(
+      persons,
+      [round(1, 'a', 'b'), round(2, 'c', 'b'), round(3, 'd', 'c'), round(4, null, 'e')],
+      // b: 5, 3, 3 = 11/3; c: 4; e: unrevealed 5 does not count.
+      [talk(1, 'a', 5), talk(2, 'a', 3), talk(2, 'd', 3), talk(3, 'a', 4), talk(4, 'a', 5)],
+    );
+    expect(award(f.awards, 'rampensau').winners).toEqual(['c']);
+  });
+
+  it('a tie on the average goes to more ratings, a full tie is shared', () => {
+    const more = buildFinale(
+      persons,
+      [round(1, 'a', 'b'), round(2, 'b', 'c')],
+      // b: 5 + 4 (2 ratings); c: 5 + 5 + 4 + 4 (4 ratings), both 4.5.
+      [talk(1, 'a', 5), talk(1, 'c', 4), talk(2, 'a', 5), talk(2, 'b', 5), talk(2, 'd', 4), talk(2, 'e', 4)],
+    );
+    expect(award(more.awards, 'rampensau').winners).toEqual(['c']);
+
+    const shared = buildFinale(
+      persons,
+      [round(1, 'a', 'b'), round(2, 'b', 'c')],
+      [talk(1, 'a', 4), talk(1, 'c', 5), talk(2, 'a', 5), talk(2, 'd', 4)],
+    );
+    expect(award(shared.awards, 'rampensau')).toEqual({ kind: 'rampensau', winners: ['b', 'c'], value: 4.5 });
+  });
+
+  it('nobody qualifies without talk ratings', () => {
+    const f = buildFinale(persons, [round(1, 'a', 'b')], [vote(1, 'c', 'a', 5)]);
+    expect(award(f.awards, 'rampensau')).toEqual({ kind: 'rampensau', winners: [], value: 0 });
   });
 });

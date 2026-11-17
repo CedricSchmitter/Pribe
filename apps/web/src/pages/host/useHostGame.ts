@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { Ack, HostSnapshot, Person, PersonId, ReactionEvent, WheelSpunEvent } from '@pribe/shared';
+import type { Ack, ComboEvent, HostSnapshot, Person, PersonId, ReactionEvent, WheelSpunEvent } from '@pribe/shared';
 import { createHostSocket } from '../../lib/socket';
 import { useSocket } from '../../lib/useSocket';
 
@@ -12,6 +12,8 @@ export interface HostGame {
   now(): number;
   person(id: PersonId | null | undefined): Person | undefined;
   reactions: ReactionEvent[];
+  /** Running emoji combo (R85); cleared a moment after its last update. */
+  combo: ComboEvent | null;
   wheel: WheelSpunEvent | null;
   clearWheel(): void;
   command(name: HostCommand): Promise<Ack<unknown>>;
@@ -19,12 +21,15 @@ export interface HostGame {
 }
 
 const REACTION_TTL_MS = 4500;
+const COMBO_HOLD_MS = 2500;
 
 export function useHostGame(enabled: boolean): HostGame {
   const { socket, status } = useSocket(createHostSocket, enabled);
   const [snapshot, setSnapshot] = useState<HostSnapshot | null>(null);
   const [reactions, setReactions] = useState<ReactionEvent[]>([]);
   const [wheel, setWheel] = useState<WheelSpunEvent | null>(null);
+  const [combo, setCombo] = useState<ComboEvent | null>(null);
+  const comboTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const offset = useRef(0);
 
   useEffect(() => {
@@ -37,12 +42,20 @@ export function useHostGame(enabled: boolean): HostGame {
       setReactions((list) => [...list.slice(-60), r]);
       setTimeout(() => setReactions((list) => list.filter((x) => x.id !== r.id)), REACTION_TTL_MS);
     };
+    const onCombo = (e: ComboEvent) => {
+      setCombo(e);
+      clearTimeout(comboTimer.current);
+      comboTimer.current = setTimeout(() => setCombo(null), COMBO_HOLD_MS);
+    };
     socket.on('state', onState);
     socket.on('reaction', onReaction);
+    socket.on('reaction:combo', onCombo);
     socket.on('wheel:spun', setWheel);
     return () => {
       socket.off('state', onState);
       socket.off('reaction', onReaction);
+      socket.off('reaction:combo', onCombo);
+      clearTimeout(comboTimer.current);
       socket.off('wheel:spun', setWheel);
     };
   }, [socket]);
@@ -68,7 +81,7 @@ export function useHostGame(enabled: boolean): HostGame {
     [socket],
   );
 
-  return { snapshot, status, now, person, reactions, wheel, clearWheel: () => setWheel(null), command, draw };
+  return { snapshot, status, now, person, reactions, combo, wheel, clearWheel: () => setWheel(null), command, draw };
 }
 
 /** Re-renders at `fps` while mounted; for countdowns and the time bar. */

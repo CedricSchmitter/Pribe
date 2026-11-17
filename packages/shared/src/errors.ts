@@ -22,6 +22,7 @@ export const ERROR_CODES = [
   'INVALID_INVITE_CODE',
   'NAME_TAKEN',
   'UNSUPPORTED_IMAGE',
+  'CANNOT_RATE_SELF',
 ] as const;
 export type ErrorCode = (typeof ERROR_CODES)[number];
 
@@ -48,6 +49,7 @@ export const ERROR_MESSAGES_DE: Record<ErrorCode, string> = {
   INVALID_INVITE_CODE: 'Der Einladungscode stimmt nicht.',
   NAME_TAKEN: 'Diesen Namen gibt es schon.',
   UNSUPPORTED_IMAGE: 'Bitte ein Foto (JPEG, PNG oder WebP) bis 512 KB.',
+  CANNOT_RATE_SELF: 'Den eigenen Vortrag bewertest du nicht 😉',
 };
 
 /** Body of every non-2xx REST response and payload of failed socket acks. */

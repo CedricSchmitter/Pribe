@@ -269,3 +269,34 @@
     transform: scale(1.3);
   }
 }
+
+/* Emoji combo (R85): covers the stage above the flying reactions. */
+.fx-combo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.15) 55%, transparent 75%);
+}
+
+.fx-combo-emoji {
+  font-size: min(55vh, 40vw);
+  line-height: 1;
+  filter: drop-shadow(0 20px 60px rgba(255, 208, 0, 0.8));
+}
+
+.fx-combo-count {
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: clamp(4rem, 9vw, 10rem);
+  line-height: 1;
+  color: #ffd000;
+  -webkit-text-stroke: 6px #1a1a1a;
+  paint-order: stroke fill;
+  text-shadow: 0 10px 0 #1a1a1a;
+  letter-spacing: 0.04em;
+}

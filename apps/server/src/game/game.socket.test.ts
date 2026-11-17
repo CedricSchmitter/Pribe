@@ -110,7 +110,7 @@ describe('game over sockets', () => {
     for (const s of phones) {
       expect(await call(s, 'vote:cast', { roundId, guessPersonId: anna.id, stars: 4 })).toEqual({
         ok: true,
-        data: { roundId, guessPersonId: anna.id, stars: 4 },
+        data: { roundId, guessPersonId: anna.id, stars: 4, talkStars: null },
       });
     }
     expect(await call(phones[1]!, 'vote:cast', { roundId, stars: 9 })).toMatchObject({ ok: false, error: 'INVALID_PAYLOAD' });

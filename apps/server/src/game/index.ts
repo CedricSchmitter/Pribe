@@ -17,6 +17,7 @@ import type { AppContext } from '../context';
 import { isOwner } from '../security/hmac';
 import type { HostNamespace, VoteNamespace } from '../sockets';
 import { GameEngine, type Result } from './engine';
+import { createComboDetector } from './combo';
 import { createThrottle } from './throttle';
 
 export { GameEngine } from './engine';
@@ -49,6 +50,7 @@ function parse<T>(schema: ZodType<T>, payload: unknown): T | null {
 export function registerGame(ns: { host: HostNamespace; vote: VoteNamespace }, ctx: AppContext): () => void {
   const { host, vote } = ns;
   const reactions = createThrottle(REACTION_THROTTLE);
+  const combos = createComboDetector({ newId: randomUUID });
   const personSessions = createPersonSessions(ctx.config.secret, ctx.repos.persons);
 
   const connectedPersonIds = (): PersonId[] => {
@@ -143,7 +145,10 @@ export function registerGame(ns: { host: HostNamespace; vote: VoteNamespace }, c
       const phase = engine.phase();
       if (phase !== 'presenting' && phase !== 'countdown') return reject(ack, 'WRONG_PHASE');
       if (!reactions.take(socket.id)) return reject(ack, 'RATE_LIMITED');
-      host.emit('reaction', { id: randomUUID(), emoji: p.emoji, personId: socket.data.personId, at: Date.now() });
+      const at = Date.now();
+      host.emit('reaction', { id: randomUUID(), emoji: p.emoji, personId: socket.data.personId, at });
+      const combo = combos.add(p.emoji, at);
+      if (combo) host.emit('reaction:combo', combo);
       safeAck(ack)({ ok: true });
     });
 

@@ -14,7 +14,7 @@ interface Props {
   inCountdown: boolean;
   myVote: MyVote | null;
   clockOffset: number;
-  cast(payload: { roundId: number; guessPersonId?: PersonId | null; stars?: number | null }): Promise<CastResult>;
+  cast(payload: { roundId: number; guessPersonId?: PersonId | null; stars?: number | null; talkStars?: number | null }): Promise<CastResult>;
   react(emoji: ReactionEmoji): Promise<CastResult & { rateLimited?: boolean }>;
 }
 
@@ -36,12 +36,16 @@ export function VotingPanel({ me, persons, round, inCountdown, myVote, clockOffs
   const remote = myVote?.roundId === round.id ? myVote : null;
   const [guess, setGuess] = useState<PersonId | null>(remote?.guessPersonId ?? null);
   const [stars, setStars] = useState<number | null>(remote?.stars ?? null);
+  const [talkStars, setTalkStars] = useState<number | null>(remote?.talkStars ?? null);
+  // Who presents is public anyway, so locking their own talk stars reveals nothing (R84).
+  const presenting = me.id === round.presenterId;
 
   // Server state wins after reconnects or a vote from a second tab.
   useEffect(() => {
     setGuess(remote?.guessPersonId ?? null);
     setStars(remote?.stars ?? null);
-  }, [round.id, remote?.guessPersonId, remote?.stars]);
+    setTalkStars(remote?.talkStars ?? null);
+  }, [round.id, remote?.guessPersonId, remote?.stars, remote?.talkStars]);
 
   const now = useServerNow(clockOffset);
   const total = round.countdownEndsAt && round.closedAt ? round.countdownEndsAt - round.closedAt : 1;
@@ -77,13 +81,35 @@ export function VotingPanel({ me, persons, round, inCountdown, myVote, clockOffs
     }
   };
 
+  const pickTalkStars = async (n: number) => {
+    if (closed || presenting) return;
+    const prev = talkStars;
+    setTalkStars(n);
+    if (n === STARS_MAX) emojiBurst(['🎤', '🔥'], { x: 0.5, y: 0.35 }, 20);
+    else if (n === 1) emojiBurst(['😴'], { x: 0.5, y: 0.35 }, 8);
+    const res = await cast({ roundId: round.id, talkStars: n });
+    if (!res.ok) {
+      setTalkStars(prev);
+      toast(res.message, 'error');
+    }
+  };
+
   const guessed = persons.find((p) => p.id === guess);
 
   return (
     <div className="vote-page vote-voting stack">
       <Timer remainingMs={remainingMs} total={total} roundNumber={round.number} />
 
-      <StarsSection stars={stars} closed={closed} onPick={(n) => void pickStars(n)} />
+      <StarsSection title="WIE SIND DIE FOLIEN?" label="Folien bewerten" stars={stars} closed={closed} onPick={(n) => void pickStars(n)} />
+
+      {presenting ? (
+        <section className="stack-tight vote-talk-self" aria-label="Vortrag bewerten">
+          <h2 className="label vote-section-title">WIE WAR DER VORTRAG?</h2>
+          <p className="muted">🎤 Das ist dein Vortrag – den bewerten die anderen.</p>
+        </section>
+      ) : (
+        <StarsSection title="WIE WAR DER VORTRAG?" label="Vortrag bewerten" stars={talkStars} closed={closed} onPick={(n) => void pickTalkStars(n)} />
+      )}
 
       <section className="stack-tight" aria-label="Dein Tipp">
         <h2 className="label vote-section-title">WER HAT DIE EINGEREICHT?</h2>
@@ -141,11 +167,11 @@ export function VotingPanel({ me, persons, round, inCountdown, myVote, clockOffs
   );
 }
 
-function StarsSection({ stars, closed, onPick }: { stars: number | null; closed: boolean; onPick(n: number): void }) {
+function StarsSection({ title, label, stars, closed, onPick }: { title: string; label: string; stars: number | null; closed: boolean; onPick(n: number): void }) {
   return (
-    <section className="stack-tight" aria-label="Folien bewerten">
-      <h2 className="label vote-section-title">WIE SIND DIE FOLIEN?</h2>
-      <div className="vote-stars" role="radiogroup" aria-label="Sterne">
+    <section className="stack-tight" aria-label={label}>
+      <h2 className="label vote-section-title">{title}</h2>
+      <div className="vote-stars" role="radiogroup" aria-label={`Sterne: ${label}`}>
         {Array.from({ length: STARS_MAX }, (_, i) => i + 1).map((n) => (
           <motion.button
             key={n}

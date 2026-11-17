@@ -7,7 +7,7 @@ export interface LeaderboardEntry {
   rank: number;
 }
 
-export const AWARD_KINDS = ['hellseher', 'pokerface', 'blindgaenger', 'herdentier'] as const;
+export const AWARD_KINDS = ['hellseher', 'pokerface', 'blindgaenger', 'herdentier', 'rampensau'] as const;
 export type AwardKind = (typeof AWARD_KINDS)[number];
 
 export const AWARD_LABELS_DE: Record<AwardKind, { title: string; description: string }> = {
@@ -15,13 +15,14 @@ export const AWARD_LABELS_DE: Record<AwardKind, { title: string; description: st
   pokerface: { title: 'Pokerface', description: 'Eigene Präsentation am seltensten erraten' },
   blindgaenger: { title: 'Blindgänger', description: 'Kein einziger Treffer' },
   herdentier: { title: 'Herdentier', description: 'Am häufigsten mit der Mehrheit getippt' },
+  rampensau: { title: 'Rampensau', description: 'Der beste Vortrag (höchster Ø)' },
 };
 
 export interface Award {
   kind: AwardKind;
   /** Several winners on a tie; empty when nobody qualifies. */
   winners: PersonId[];
-  /** The metric that won, e.g. hits, times guessed, majority guesses. */
+  /** The metric that won, e.g. hits, times guessed, majority guesses, talk average. */
   value: number;
 }
 
@@ -37,6 +38,9 @@ export interface PlayerStats {
   /** Counting guesses on this person's own shown presentation; `null` without one. */
   ownGuessers: number | null;
   ownGuessedRight: number | null;
+  /** R84: counting talk ratings over all rounds this person presented; absent from older producers. */
+  talkRatingCount?: number;
+  avgTalkStars?: number | null;
 }
 
 /** One edge of the guess network: `fromId` guessed `toId` `count` times. */
@@ -56,6 +60,8 @@ export interface RoundSummary {
   avgStars: number | null;
   ratingCount: number;
   correctCount: number;
+  avgTalkStars?: number | null;
+  talkRatingCount?: number;
 }
 
 export interface BestPresentation {

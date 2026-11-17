@@ -6,6 +6,7 @@ export const AWARD_EMOJI: Record<AwardKind, string> = {
   pokerface: '🃏',
   blindgaenger: '🙈',
   herdentier: '🐑',
+  rampensau: '🐷',
 };
 
 export const AWARD_NOBODY: Record<AwardKind, string> = {
@@ -13,6 +14,7 @@ export const AWARD_NOBODY: Record<AwardKind, string> = {
   pokerface: 'Keine Präsentation wurde geraten',
   blindgaenger: 'Alle haben mindestens einmal getroffen 🎯',
   herdentier: 'Nie gab es eine klare Mehrheit',
+  rampensau: 'Kein Vortrag wurde bewertet 🎤',
 };
 
 /** "x von y" line for one award winner. */
@@ -27,6 +29,8 @@ export function awardDetail(kind: AwardKind, s: PlayerStats | undefined): string
       return `0 von ${s.guesses} Tipps richtig`;
     case 'herdentier':
       return `${s.withMajority}× mit der Mehrheit getippt`;
+    case 'rampensau':
+      return s.avgTalkStars == null ? '' : `Vortrag Ø ${s.avgTalkStars.toFixed(1)} ⭐ (${s.talkRatingCount ?? 0} Bewertungen)`;
   }
 }
 

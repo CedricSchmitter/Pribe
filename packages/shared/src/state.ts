@@ -48,6 +48,9 @@ export interface RevealResult {
   /** Average without the owner's own stars (D16); `null` without ratings. */
   avgStars: number | null;
   ratingCount: number;
+  /** R84: talk average without the presenter's own stars; the owner's talk stars count. */
+  avgTalkStars: number | null;
+  talkRatingCount: number;
 }
 
 export const REVEAL_OUTCOMES = ['correct', 'wrong', 'noGuess', 'owner'] as const;
@@ -58,6 +61,7 @@ export interface MyVote {
   roundId: RoundId;
   guessPersonId: PersonId | null;
   stars: number | null;
+  talkStars: number | null;
 }
 
 export interface SnapshotBase {

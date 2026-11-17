@@ -85,4 +85,8 @@ export const MIGRATIONS: readonly string[] = [
   -- NULL = registration closed.
   ALTER TABLE settings ADD COLUMN invite_code TEXT;
   `,
+  /* sql */ `
+  -- Talk rating (R84), next to the slide stars.
+  ALTER TABLE votes ADD COLUMN talk_stars INTEGER CHECK (talk_stars BETWEEN 1 AND 5);
+  `,
 ];

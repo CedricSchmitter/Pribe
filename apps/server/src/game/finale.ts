@@ -9,7 +9,7 @@ import type {
   RoundSummary,
 } from '@pribe/shared';
 import type { Repositories, RoundRecord, VoteRecord } from '../db';
-import { computeLeaderboard } from './scoring';
+import { average, computeLeaderboard, countingTalkStars } from './scoring';
 
 /*
  * Award rules (R63), all over revealed rounds only and without the owner's dummy vote (D07):
@@ -20,6 +20,9 @@ import { computeLeaderboard } from './scoring';
  * - Herdentier: most guesses that matched the round's majority; needs at least one.
  *   A round has a majority when one person got strictly the most guesses, and at least
  *   two of them — a lone guess is not a herd. Ties: all.
+ * - Rampensau (R84): highest talk average over all rounds the person presented (ratings
+ *   pooled, the presenter's own never count, the owner's do). Needs at least one rating.
+ *   Like Beste Präsentation (D28): a tie goes to more ratings, a remaining tie is shared.
  * An award nobody qualifies for has no winners.
  */
 
@@ -30,6 +33,7 @@ interface RevealedRound {
   guesses: VoteRecord[];
   /** Ratings that count (D16). */
   stars: number[];
+  talkStars: number[];
 }
 
 function revealedRounds(persons: Person[], rounds: RoundRecord[], votes: VoteRecord[]): RevealedRound[] {
@@ -44,6 +48,10 @@ function revealedRounds(persons: Person[], rounds: RoundRecord[], votes: VoteRec
         ownerId,
         guesses: counting.filter((v) => v.guessPersonId !== null && known.has(v.guessPersonId)),
         stars: counting.map((v) => v.stars).filter((s): s is number => s !== null),
+        talkStars: countingTalkStars(
+          votes.filter((v) => v.roundId === round.id && known.has(v.voterId)),
+          round.presenterId,
+        ),
       };
     });
 }
@@ -62,10 +70,27 @@ function computeStats(persons: Person[], revealed: RevealedRound[]): PlayerStats
   const stats = new Map<PersonId, PlayerStats>(
     persons.map((p) => [
       p.id,
-      { personId: p.id, guesses: 0, hits: 0, majorityRounds: 0, withMajority: 0, ownGuessers: null, ownGuessedRight: null },
+      {
+        personId: p.id,
+        guesses: 0,
+        hits: 0,
+        majorityRounds: 0,
+        withMajority: 0,
+        ownGuessers: null,
+        ownGuessedRight: null,
+        talkRatingCount: 0,
+        avgTalkStars: null,
+      },
     ]),
   );
+  const talkSums = new Map<PersonId, number>();
   for (const r of revealed) {
+    const presenter = r.round.presenterId ? stats.get(r.round.presenterId) : undefined;
+    if (presenter && r.talkStars.length) {
+      presenter.talkRatingCount! += r.talkStars.length;
+      talkSums.set(presenter.personId, (talkSums.get(presenter.personId) ?? 0) + r.talkStars.reduce((a, b) => a + b, 0));
+      presenter.avgTalkStars = talkSums.get(presenter.personId)! / presenter.talkRatingCount!;
+    }
     const majority = majorityOf(r.guesses);
     let right = 0;
     for (const v of r.guesses) {
@@ -101,7 +126,19 @@ export function computeAwards(stats: PlayerStats[]): Award[] {
   const pokerface = pick('pokerface', stats.filter((s) => (s.ownGuessers ?? 0) > 0), (s) => s.ownGuessedRight!, 'min');
   const blindgaenger = pick('blindgaenger', stats.filter((s) => s.guesses > 0 && s.hits === 0), () => 0, 'max');
   const herdentier = pick('herdentier', stats.filter((s) => s.withMajority > 0), (s) => s.withMajority, 'max');
-  return [hellseher, pokerface, blindgaenger, herdentier];
+  return [hellseher, pokerface, blindgaenger, herdentier, computeRampensau(stats)];
+}
+
+export function computeRampensau(stats: PlayerStats[]): Award {
+  const rated = stats.filter((s) => (s.talkRatingCount ?? 0) > 0 && s.avgTalkStars != null);
+  if (rated.length === 0) return { kind: 'rampensau', winners: [], value: 0 };
+  // Integer star sums compared as fractions, so equal averages never split on float noise.
+  const n = (s: PlayerStats) => s.talkRatingCount!;
+  const sum = (s: PlayerStats) => Math.round(s.avgTalkStars! * n(s));
+  const cmp = (a: PlayerStats, b: PlayerStats) => sum(b) * n(a) - sum(a) * n(b) || n(b) - n(a);
+  const sorted = [...rated].sort(cmp);
+  const top = sorted[0]!;
+  return { kind: 'rampensau', winners: sorted.filter((s) => cmp(s, top) === 0).map((s) => s.personId), value: top.avgTalkStars! };
 }
 
 export function computeGuessNetwork(revealed: RevealedRound[]): GuessEdge[] {
@@ -127,6 +164,8 @@ function computeRoundSummaries(revealed: RevealedRound[]): RoundSummary[] {
     avgStars: r.stars.length ? r.stars.reduce((a, b) => a + b, 0) / r.stars.length : null,
     ratingCount: r.stars.length,
     correctCount: r.guesses.filter((v) => v.guessPersonId === r.ownerId).length,
+    avgTalkStars: average(r.talkStars),
+    talkRatingCount: r.talkStars.length,
   }));
 }
 

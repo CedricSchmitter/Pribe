@@ -594,6 +594,8 @@ function expectedFinale(persons: Person[], votes: Map<number, Map<number, CastPl
     best('pokerface', all.filter((x) => guessedRight[x] !== null), (x) => guessedRight[x]!, 'min'),
     best('blindgaenger', all.filter((x) => guesses[x]! > 0 && points[x] === 0), () => 0, 'max'),
     best('herdentier', all.filter((x) => withMajority[x]! > 0), (x) => withMajority[x]!, 'max'),
+    // This flow casts no talk stars (R84), so nobody qualifies.
+    { kind: 'rampensau', winners: [], value: 0 },
   ];
   return { points, awards, network: [...edges.values()] };
 }

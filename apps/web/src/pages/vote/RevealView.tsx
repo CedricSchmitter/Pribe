@@ -111,6 +111,7 @@ export function RevealView({ reveal, outcome, persons, myVote }: Props) {
           <p className="muted">
             {correctCount} {correctCount === 1 ? 'Person lag' : 'Personen lagen'} richtig
             {reveal.avgStars !== null && ` · Folien ⭐ ${reveal.avgStars.toFixed(1)}`}
+            {reveal.avgTalkStars != null && ` · Vortrag 🎤 ${reveal.avgTalkStars.toFixed(1)}`}
           </p>
         </motion.div>
       )}

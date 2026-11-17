@@ -49,7 +49,7 @@ export function Countdown({ game }: { game: HostGame }) {
           </AnimatePresence>
         </div>
       </div>
-      <ReactionOverlay reactions={game.reactions} person={game.person} />
+      <ReactionOverlay reactions={game.reactions} combo={game.combo} person={game.person} />
     </div>
   );
 }

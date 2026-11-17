@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { motion } from 'motion/react';
-import type { Person, PersonId, ReactionEvent } from '@pribe/shared';
+import type { ComboEvent, Person, PersonId, ReactionEvent } from '@pribe/shared';
 import { Avatar } from '../../components/Avatar';
+import { ComboBlast } from '../../fx';
 
 /** Seeded from the reaction id so a re-render does not move a flying emoji. */
 function seeded(id: string): () => number {
@@ -43,12 +44,23 @@ function Flyer({ r, person }: { r: ReactionEvent; person: Person | undefined }) 
   );
 }
 
-export function ReactionOverlay({ reactions, person }: { reactions: ReactionEvent[]; person(id: PersonId | null): Person | undefined }) {
+export function ReactionOverlay({
+  reactions,
+  combo,
+  person,
+}: {
+  reactions: ReactionEvent[];
+  combo: ComboEvent | null;
+  person(id: PersonId | null): Person | undefined;
+}) {
   return (
-    <div className="host-reactions" aria-hidden>
-      {reactions.map((r) => (
-        <Flyer key={r.id} r={r} person={person(r.personId)} />
-      ))}
+    <div className="host-reactions">
+      <div aria-hidden>
+        {reactions.map((r) => (
+          <Flyer key={r.id} r={r} person={person(r.personId)} />
+        ))}
+      </div>
+      <ComboBlast combo={combo} />
     </div>
   );
 }
