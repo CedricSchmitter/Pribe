@@ -43,7 +43,7 @@ describe('http', () => {
   });
 
   it('serves index.html for the SPA routes and JSON 404 elsewhere', async () => {
-    for (const url of ['/', '/admin', '/submit', '/host', '/vote', '/vote/x?y=1']) {
+    for (const url of ['/', '/admin', '/submit', '/host', '/vote', '/remote', '/vote/x?y=1']) {
       const res = await built.app.inject({ url });
       expect(res.statusCode, url).toBe(200);
       expect(res.body).toContain('<title>Pribe</title>');

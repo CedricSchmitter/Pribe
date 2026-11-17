@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router';
 import { API_PATHS, type Person, type PersonMeDto } from '@pribe/shared';
 import { api } from '../../lib/api';
 import { useShellAvatar } from '../../shell';
+import { PresenterBanner } from './PresenterBanner';
 import { RevealView } from './RevealView';
 import { useVoteGame } from './useVoteGame';
 import { VoteLogin } from './VoteLogin';
@@ -134,6 +135,7 @@ export function VotePage() {
           📡 Verbindung weg – verbinde neu …
         </motion.div>
       )}
+      {me && snapshot && <PresenterBanner snapshot={snapshot} clockOffset={clockOffset} />}
       <AnimatePresence mode="wait">
         <motion.div
           key={key}

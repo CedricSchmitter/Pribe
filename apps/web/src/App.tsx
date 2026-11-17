@@ -3,6 +3,7 @@ import { HomePage } from './pages/HomePage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { AdminPage } from './pages/admin/AdminPage';
 import { HostPage } from './pages/host/HostPage';
+import { RemotePage } from './pages/remote/RemotePage';
 import { SubmitPage } from './pages/submit/SubmitPage';
 import { VotePage } from './pages/vote/VotePage';
 import { ShellLayout } from './shell';
@@ -17,6 +18,7 @@ export function App() {
         <Route path="/submit/*" element={<SubmitPage />} />
         <Route path="/host/*" element={<HostPage />} />
         <Route path="/vote/*" element={<VotePage />} />
+        <Route path="/remote/*" element={<RemotePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
