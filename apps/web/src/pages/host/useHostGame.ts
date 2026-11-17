@@ -18,6 +18,7 @@ export interface HostGame {
   clearWheel(): void;
   command(name: HostCommand): Promise<Ack<unknown>>;
   draw(presenterId: PersonId): Promise<Ack<unknown>>;
+  finaleStep(step: number): Promise<Ack<unknown>>;
 }
 
 const REACTION_TTL_MS = 4500;
@@ -81,7 +82,16 @@ export function useHostGame(enabled: boolean): HostGame {
     [socket],
   );
 
-  return { snapshot, status, now, person, reactions, combo, wheel, clearWheel: () => setWheel(null), command, draw };
+  const finaleStep = useCallback(
+    (step: number) =>
+      new Promise<Ack<unknown>>((resolve) => {
+        if (!socket) return resolve({ ok: false, error: 'INTERNAL', message: 'Keine Verbindung.' });
+        socket.emit('finale:step', { step }, resolve as (res: Ack) => void);
+      }),
+    [socket],
+  );
+
+  return { snapshot, status, now, person, reactions, combo, wheel, clearWheel: () => setWheel(null), command, draw, finaleStep };
 }
 
 /** Re-renders at `fps` while mounted; for countdowns and the time bar. */

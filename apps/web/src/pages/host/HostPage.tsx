@@ -59,7 +59,12 @@ export function HostPage() {
     ) : phase === 'reveal' && s.reveal ? (
       <Reveal game={game} onError={onError} />
     ) : phase === 'finale' && s.finale ? (
-      <FinaleShow finale={s.finale} persons={s.persons} />
+      <FinaleShow
+        finale={s.finale}
+        persons={s.persons}
+        step={s.finaleStep ?? 0}
+        onStep={(step) => void game.finaleStep(step).then((res) => !res.ok && onError(res.message))}
+      />
     ) : null;
 
   return (

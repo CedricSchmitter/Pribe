@@ -23,6 +23,8 @@ export const ERROR_CODES = [
   'NAME_TAKEN',
   'UNSUPPORTED_IMAGE',
   'CANNOT_RATE_SELF',
+  /** R87: too many wrong admin passwords from this IP; the message names the remaining time. */
+  'LOGIN_LOCKED',
 ] as const;
 export type ErrorCode = (typeof ERROR_CODES)[number];
 
@@ -50,6 +52,7 @@ export const ERROR_MESSAGES_DE: Record<ErrorCode, string> = {
   NAME_TAKEN: 'Diesen Namen gibt es schon.',
   UNSUPPORTED_IMAGE: 'Bitte ein Foto (JPEG, PNG oder WebP) bis 512 KB.',
   CANNOT_RATE_SELF: 'Den eigenen Vortrag bewertest du nicht 😉',
+  LOGIN_LOCKED: 'Zu viele Fehlversuche. Bitte später erneut versuchen.',
 };
 
 /** Body of every non-2xx REST response and payload of failed socket acks. */

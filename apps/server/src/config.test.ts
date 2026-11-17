@@ -14,6 +14,13 @@ describe('parseConfig', () => {
     expect(c.filesDir).toBe(path.join(REPO_ROOT, 'data', 'files'));
     expect(c.publicUrl).toBe('https://pribe.example.org');
     expect(c.secureCookies).toBe(true);
+    expect(c.trustProxy).toBe(false);
+  });
+
+  it('reads TRUST_PROXY as a boolean', () => {
+    expect(parseConfig({ ...base, TRUST_PROXY: 'true' }).trustProxy).toBe(true);
+    expect(parseConfig({ ...base, TRUST_PROXY: 'false' }).trustProxy).toBe(false);
+    expect(() => parseConfig({ ...base, TRUST_PROXY: 'vielleicht' })).toThrow(/TRUST_PROXY/);
   });
 
   it('keeps absolute DATA_DIR and coerces numbers', () => {

@@ -11,6 +11,7 @@ import { crc32, deflateSync } from 'node:zlib';
 import { strFromU8, unzipSync } from 'fflate';
 import {
   API_PATHS,
+  RESET_ALL_CONFIRMATION,
   type AdminPersonDto,
   type Person,
   type PersonMeDto,
@@ -123,9 +124,8 @@ async function main() {
             'Mit "npm run demo:seed -- --force" werden Spiel, Einreichungen und Personen gelöscht und neu angelegt.',
         );
       }
-      await call('POST', API_PATHS.admin.reset, { cookie: admin, json: { deleteSubmissions: true } });
-      for (const p of existing) await call('DELETE', API_PATHS.admin.person(p.id), { cookie: admin });
-      console.log(`--force: ${existing.length} Personen, Spiel und Einreichungen gelöscht.`);
+      await call('POST', API_PATHS.admin.resetAll, { cookie: admin, json: { confirm: RESET_ALL_CONFIRMATION } });
+      console.log(`--force: ${existing.length} Personen, Spiel, Einreichungen und Themen gelöscht.`);
     }
 
     await call('PUT', API_PATHS.admin.settings, {

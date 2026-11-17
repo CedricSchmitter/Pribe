@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import { LoginForm } from '../../components/LoginForm';
 import { useAuth } from '../../lib/auth';
@@ -10,6 +11,8 @@ import './admin.css';
 /** Admin area (P2). Logout lives in the shell's avatar menu. */
 export function AdminPage() {
   const { authenticated, login } = useAuth();
+  // Bumped after a reset so panels that load once remount with fresh data.
+  const [resets, setResets] = useState(0);
   if (authenticated === null) return null;
 
   if (!authenticated) {
@@ -33,11 +36,11 @@ export function AdminPage() {
     <main className="page admin">
       <h1>Admin</h1>
       <div className="admin-grid">
-        <PersonsPanel />
+        <PersonsPanel key={`persons-${resets}`} />
         <div className="admin-column">
           <SettingsPanel />
-          <SubmissionsPanel />
-          <ResetPanel />
+          <SubmissionsPanel key={`submissions-${resets}`} />
+          <ResetPanel onReset={() => setResets((n) => n + 1)} />
         </div>
       </div>
     </main>

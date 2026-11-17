@@ -1,0 +1,135 @@
+.remote {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.remote.center {
+  min-height: 100%;
+}
+
+.remote-status.card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.remote-status-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.remote-phase {
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+.remote-presenter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.remote-presenter-name {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.remote-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.remote-figures div {
+  background: var(--surface-soft);
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-3);
+}
+
+.remote-figures dt {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.remote-figures dd {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.remote-figures dd.over {
+  color: var(--color-error);
+}
+
+.remote-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+button.remote-big {
+  min-height: 72px;
+  width: 100%;
+  font-size: 22px;
+}
+
+.remote-persons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-2);
+}
+
+button.remote-person {
+  min-height: 56px;
+  justify-content: flex-start;
+  padding: var(--space-2);
+  text-align: left;
+}
+
+button.remote-person.selected {
+  border-color: var(--surface-primary);
+  box-shadow: 0 0 0 3px var(--surface-primary);
+}
+
+button.remote-person.presented {
+  opacity: 0.6;
+}
+
+.remote-wheel {
+  background: var(--surface-primary);
+  color: var(--text-on-primary);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  font-weight: 700;
+  text-align: center;
+}
+
+.remote-station {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  text-align: center;
+}
+
+.remote-station-name {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.remote-finale-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}

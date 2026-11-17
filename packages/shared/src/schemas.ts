@@ -42,15 +42,22 @@ export const RegisterRequestSchema = PersonInputSchema.extend({
 });
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
 
-export const ResetRequestSchema = z.object({
-  deleteSubmissions: z.boolean().default(false),
+/** The word the admin types to confirm „Alles löschen“ (D30). */
+export const RESET_ALL_CONFIRMATION = 'LÖSCHEN';
+
+export const ResetAllRequestSchema = z.object({
+  confirm: z.literal(RESET_ALL_CONFIRMATION),
 });
-export type ResetRequest = z.infer<typeof ResetRequestSchema>;
+export type ResetAllRequest = z.infer<typeof ResetAllRequestSchema>;
 
 // Socket payloads (validated server-side)
 
 export const DrawPayloadSchema = z.object({ presenterId: PersonIdSchema });
 export type DrawPayload = z.infer<typeof DrawPayloadSchema>;
+
+/** Absolute station index, so two host clients pressing "Weiter" at once land on the same station. */
+export const FinaleStepPayloadSchema = z.object({ step: z.number().int().min(0).max(999) });
+export type FinaleStepPayload = z.infer<typeof FinaleStepPayloadSchema>;
 
 export const IdentifyPayloadSchema = z.object({ personId: PersonIdSchema.nullable() });
 export type IdentifyPayload = z.infer<typeof IdentifyPayloadSchema>;

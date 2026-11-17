@@ -18,7 +18,12 @@ export const API_PATHS = {
     personPhoto: (id: string) => `/api/admin/persons/${encodeURIComponent(id)}/photo`,
     settings: '/api/admin/settings',
     submissions: '/api/admin/submissions',
+    /** POST: game reset (R88) — rounds, votes and game state; persons, submissions and topics stay. */
     reset: '/api/admin/reset',
+    /** POST: frees all 18 topics (R88). */
+    resetTopics: '/api/admin/reset/topics',
+    /** POST `ResetAllRequest`: deletes everything except the settings (R88, D30). */
+    resetAll: '/api/admin/reset/all',
   },
   /** Open endpoints for phones (P2). */
   persons: '/api/persons',
@@ -29,6 +34,10 @@ export const API_PATHS = {
     submission: (id: SubmissionId) => `/api/submit/submissions/${encodeURIComponent(id)}`,
     /** GET: the logged-in person's own submission (`SubmissionStatusDto`), 404 without one. */
     mine: '/api/submit/mine',
+    /** GET: `SubmissionPreviewDto` of the own ready submission (R81), 404 otherwise. */
+    minePreview: '/api/submit/mine/preview',
+    /** GET: the own ready HTML file, sandboxed via CSP (D04); 404 for PPTX. */
+    mineFile: '/api/submit/mine/file',
     /** GET: `TopicResponseDto` for the logged-in person. */
     topic: '/api/submit/topic',
     /** POST: assigns a topic once (D26); later calls return the same one. */
@@ -69,7 +78,7 @@ export interface HostInfoDto {
 }
 
 /** Client SPA routes served with the index.html fallback. */
-export const CLIENT_ROUTES = ['/admin', '/submit', '/host', '/vote'] as const;
+export const CLIENT_ROUTES = ['/admin', '/submit', '/host', '/vote', '/remote'] as const;
 
 export const SESSION_COOKIE_NAME = 'pribe_session';
 /** Personal session (D25), separate from the admin cookie (D20). */
@@ -132,8 +141,12 @@ export interface SubmissionOverviewItem {
   status: SubmissionStatus;
 }
 
+/** Deleted row counts of a reset (R88); fields a reset does not touch are 0. */
 export interface ResetResponseDto {
-  submissionsDeleted: number;
+  rounds: number;
+  topics: number;
+  submissions: number;
+  persons: number;
 }
 
 /** Multipart field name of the upload; the uploader comes from the person cookie. */
@@ -153,6 +166,11 @@ export interface SubmitStatusDto {
   maxUploadMb: number;
   serverTime: EpochMs;
 }
+
+/** Own-submission preview on `/submit` (R81); carries nothing that identifies the person. */
+export type SubmissionPreviewDto =
+  | { kind: 'html' }
+  | { kind: 'pptx'; slideCount: number; firstSlideTitle: string | null };
 
 /** Returned by the upload; the phone keeps `submissionId` to poll its status (R24). */
 export interface SubmissionStatusDto {

@@ -1,6 +1,6 @@
 import type { EpochMs, PersonId, ReactionEmoji } from './domain';
 import type { Ack } from './errors';
-import type { CastVotePayload, DrawPayload, IdentifyPayload, ReactionPayload } from './schemas';
+import type { CastVotePayload, DrawPayload, FinaleStepPayload, IdentifyPayload, ReactionPayload } from './schemas';
 import type { HostSnapshot, MyVote, VoteSnapshot } from './state';
 
 /** `/host` needs the admin session cookie in the handshake; `/vote` is open. */
@@ -53,6 +53,8 @@ export interface HostClientToServerEvents {
   /** reveal → choosePresenter */
   'round:next': (ack: AckFn) => void;
   'finale:start': (ack: AckFn) => void;
+  /** Station of the finale show; shared by beamer and remote (R80). Only in phase `finale`. */
+  'finale:step': (payload: FinaleStepPayload, ack: AckFn) => void;
 }
 
 export interface HostServerToClientEvents {

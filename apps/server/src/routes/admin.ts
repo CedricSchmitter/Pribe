@@ -1,10 +1,12 @@
+import { rm } from 'node:fs/promises';
+import path from 'node:path';
 import type { FastifyInstance } from 'fastify';
 import {
   API_PATHS,
   apiError,
   PersonIdSchema,
   PersonInputSchema,
-  ResetRequestSchema,
+  ResetAllRequestSchema,
   SettingsInputSchema,
   type AdminPersonDto,
   type ResetResponseDto,
@@ -14,7 +16,7 @@ import {
 import type { AppContext } from '../context';
 import { transaction } from '../db';
 import { deleteSubmissionFiles } from './submitFiles';
-import { removePhoto } from './submitPhoto';
+import { avatarsDir, removePhoto } from './submitPhoto';
 
 function isUniqueViolation(err: unknown): boolean {
   return err instanceof Error && /UNIQUE constraint failed/i.test(err.message);
@@ -113,17 +115,45 @@ export async function adminRoutes(app: FastifyInstance, ctx: AppContext): Promis
     return { total: items.length, byStatus: repos.submissions.countByStatus(), items };
   });
 
-  app.post(API_PATHS.admin.reset, async (req, reply) => {
-    const body = ResetRequestSchema.safeParse(req.body ?? {});
-    if (!body.success) return reply.code(400).send(apiError('INVALID_PAYLOAD'));
-    const doomed = body.data.deleteSubmissions ? repos.submissions.list() : [];
-    transaction(ctx.db, () => {
-      repos.rounds.removeAll(); // votes cascade
-      repos.game.save('lobby', {});
-      if (body.data.deleteSubmissions) repos.submissions.removeAll();
+  const none: ResetResponseDto = { rounds: 0, topics: 0, submissions: 0, persons: 0 };
+
+  /** Back to a fresh lobby. The pool is derived from rounds, so shown submissions return to it. */
+  const resetGame = (): number => {
+    const rounds = repos.rounds.list().length;
+    repos.rounds.removeAll(); // votes cascade
+    repos.game.save('lobby', {});
+    return rounds;
+  };
+
+  // Open screens get the lobby through the onResponse hook above (stateEvents → engine restart).
+  app.post(API_PATHS.admin.reset, async (req) => {
+    const rounds = transaction(ctx.db, resetGame);
+    req.log.info({ rounds }, 'game reset');
+    return { ...none, rounds } satisfies ResetResponseDto;
+  });
+
+  app.post(API_PATHS.admin.resetTopics, async (req) => {
+    const topics = repos.topics.removeAll();
+    req.log.info({ topics }, 'topics reset');
+    return { ...none, topics } satisfies ResetResponseDto;
+  });
+
+  app.post(API_PATHS.admin.resetAll, async (req, reply) => {
+    if (!ResetAllRequestSchema.safeParse(req.body).success) return reply.code(400).send(apiError('INVALID_PAYLOAD'));
+    const doomed = repos.submissions.list();
+    const result = transaction(ctx.db, () => {
+      const rounds = resetGame();
+      const topics = repos.topics.removeAll();
+      const submissions = repos.submissions.removeAll();
+      const persons = repos.persons.removeAll();
+      return { rounds, topics, submissions, persons };
     });
-    await Promise.all(doomed.map((s) => deleteSubmissionFiles(ctx, s)));
-    req.log.info({ submissionsDeleted: doomed.length }, 'game reset');
-    return { submissionsDeleted: doomed.length } satisfies ResetResponseDto;
+    await Promise.all([
+      ...doomed.map((s) => deleteSubmissionFiles(ctx, s)),
+      ...result.persons.photoFiles.map((f) => rm(path.join(avatarsDir(ctx), f), { force: true })),
+    ]);
+    const dto = { ...result, persons: result.persons.count } satisfies ResetResponseDto;
+    req.log.info(dto, 'everything deleted');
+    return dto;
   });
 }

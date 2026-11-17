@@ -85,6 +85,11 @@ export interface HostSnapshot extends SnapshotBase {
   /** Persons with at least one connected phone (lobby, R40). */
   connectedPersonIds: PersonId[];
   round: HostRoundView | null;
+  /**
+   * Current finale station, kept by the host namespace so beamer and remote stay in sync (R80).
+   * The client clamps it to its station list; 0 outside the finale.
+   */
+  finaleStep?: number;
 }
 
 export interface VoteSnapshot extends SnapshotBase {
