@@ -88,7 +88,7 @@ sie lokal per `git merge --no-ff` nach `main` (Nutzer-Freigabe). Nur der Orchest
 R91 verworfen: „zurück in die Lobby“ hätte Uploads, Personen-Löschen und weiteres Ziehen wieder geöffnet. Entscheidungen → D31. Ungeprüft: Gast im Probelauf im Browser, PPTX-Gast am Beamer, Enthüllungs-Titel in 1920×1080.
 
 ## Next concrete action
-Welle 3 (R90) ist auf main (10cc0ce). Als Nächstes die App auf :3000 neu bauen und neu starten (neue Migration), den Gast gemeinsam testen und für den Push den temporären github.com-Login vom Nutzer holen. Danach folgt L11 Generalprobe.
+Welle 3 (R90) ist auf main, vom Nutzer getestet und gepusht (77b9527). Die App läuft neu gebaut auf :3000. Nächster Schritt: L11 Generalprobe.
 ## Terrain (working set)
 - `docs/atlas/pribe/` — Missionsgedächtnis (CHARTER = R.., DECISIONS = D.., DESIGN = Optik/Shell)
 - `apps/server/src/` — `game/` (Echtzeit), `conversion/` (PPTX-Bereinigung), `routes/` (admin, submit, person, files, host), `db/`
