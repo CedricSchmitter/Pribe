@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { STARS_MAX, type MyVote, type Person, type PersonId, type ReactionEmoji, type VoteRoundView } from '@pribe/shared';
 import { emojiBurst } from '../../fx';

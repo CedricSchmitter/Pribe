@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
-import QRCode from 'qrcode';
+import { AnimatePresence, m as motion } from 'motion/react';
 import { API_PATHS, type HostInfoDto } from '@pribe/shared';
 import { emojiBurst, FloatingEmojis, JumpText, shake } from '../../fx';
 import { api } from '../../lib/api';
@@ -21,7 +20,9 @@ export function Lobby({ game, onError }: { game: HostGame; onError(msg: string):
 
   useEffect(() => {
     if (!voteUrl) return;
-    void QRCode.toString(voteUrl, { type: 'svg', margin: 1, errorCorrectionLevel: 'M' }).then(setQr);
+    void import('qrcode')
+      .then((QRCode) => QRCode.toString(voteUrl, { type: 'svg', margin: 1, errorCorrectionLevel: 'M' }))
+      .then(setQr, () => setQr(null)); // the URL below the QR still works without it
   }, [voteUrl]);
 
   const connected = snap.connectedPersonIds.map((id) => game.person(id)).filter((p) => p !== undefined);

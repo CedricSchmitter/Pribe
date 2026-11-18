@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import type { ComboEvent, Person, PersonId, ReactionEvent } from '@pribe/shared';
 import { Avatar } from '../../components/Avatar';
 import { ComboBlast } from '../../fx';

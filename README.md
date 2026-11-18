@@ -17,8 +17,10 @@ npm start              # ein Node-Prozess: API, Socket.IO und das gebaute Fronte
 
 Bereits gesetzte Umgebungsvariablen haben Vorrang vor `.env`.
 
-`npm test` enthält den Spielablauf-Test `apps/server/src/e2e/` (echter Server-Prozess auf
-einem freien Port, Host + 5 Handys, ganzer Abend inkl. Neustart). Einzeln: `npm run test:e2e`.
+`npm test` enthält die Spielablauf-Tests in `apps/server/src/e2e/` (echter Server-Prozess auf
+einem freien Port): `gameFlow` spielt mit Host + 5 Handys den ganzen Abend inkl. Neustart,
+`wave2` prüft Login-Sperre, Fernbedienung, „Du präsentierst!“, Vortrags-Sterne/Rampensau,
+Emoji-Combo, Probelauf und die drei Reset-Wege. Einzeln: `npm run test:e2e`.
 
 ## Lokal ohne Docker starten
 
@@ -45,13 +47,15 @@ einem freien Port, Host + 5 Handys, ganzer Abend inkl. Neustart). Einzeln: `npm 
    | --- | --- | --- |
    | `http://localhost:3000/admin` | Personen, Einstellungen, Einreichungen | `ADMIN_PASSWORD` aus `.env` |
    | `http://localhost:3000/host` | Beamer (1920×1080, F11 für Vollbild) | `ADMIN_PASSWORD` aus `.env` |
+   | `http://localhost:3000/remote` | Fernbedienung am Handy | `ADMIN_PASSWORD` aus `.env` |
    | `http://localhost:3000/vote` | Handy | Demo-Person, Passwort `demo` |
    | `http://localhost:3000/submit` | Einreichen | Demo-Person, Passwort `demo` |
 
 ### Demo-Daten (`npm run demo:seed`)
 
 - Legt 8 Personen an (Anna, Ben, Cleo, Dennis, Emma, Finn, Greta, Hugo), alle mit Emoji,
-  Farbe, gezogenem Thema und dem Passwort **`demo`**; Cleo, Emma und Greta haben ein Foto.
+  Farbe, gezogenem Thema und dem Passwort **`demo`**; Ben, Cleo, Emma, Finn und Greta haben
+  ein Foto, sodass die Foto-Wand im Finale Fotos und Emojis mischt.
   Die Hälfte entsteht wie im Admin, die andere Hälfte per Selbstregistrierung mit dem
   Einladungscode **`PRIBE-DEMO`**.
 - Reicht über die echte Upload-API 5 HTML-Präsentationen (`demo/html/`, Pfeiltasten und
@@ -64,6 +68,35 @@ einem freien Port, Host + 5 Handys, ganzer Abend inkl. Neustart). Einzeln: `npm 
   Port: vorher `npm start` beenden. Gibt es schon Personen, bricht es ab;
   `npm run demo:seed -- --force` löscht Spiel, Einreichungen und Personen und legt alles neu an.
 - Die PPTX-Dateien neu erzeugen: `npm run demo:pptx` (mit `pptxgenjs`).
+- Vortrags-Sterne, Rampensau und Emoji-Combo brauchen keine Vorab-Daten: Sie entstehen im
+  Spiel. Zum Ausprobieren ohne echte Mitspieler eignet sich der Probelauf.
+
+### Fernbedienung (`/remote`)
+
+Das Handy der Spielleitung meldet sich mit `ADMIN_PASSWORD` an und steuert dasselbe Spiel wie
+der Beamer: Präsentator wählen oder Rad drehen, Ziehen, Schließen und im Finale Weiter/Zurück.
+Timer und Phase sind sichtbar. So laufen PPTX-Runden, ohne zwischen PowerPoint und Browser zu
+wechseln. Beamer und Fernbedienung sind zwei getrennte Admin-Sitzungen.
+
+### Probelauf
+
+In `/admin` → *Probelauf* startet ein Testspiel mit 5 Bots und den Demo-Präsentationen aus
+`demo/`. Er läuft in einer eigenen, temporären Datenbank unter `DATA_DIR/probelauf`. Echte
+Personen, Einreichungen, Themen und der Spielstand bleiben unverändert. Beamer, Fernbedienung
+und Handys zeigen dabei einen Hinweis. *Probelauf beenden* (oder ein Neustart des Servers)
+kehrt zum echten Spiel zurück und löscht das Verzeichnis. Solange er läuft, sind die
+Reset-Wege gesperrt.
+
+### Reset-Wege (`/admin`)
+
+| Knopf | Löscht | Bleibt |
+| --- | --- | --- |
+| *Spiel zurücksetzen* | Runden, Votes, Spielstand (zurück in die Lobby) | Personen, Einreichungen, Themen, Einstellungen |
+| *Themen zurücksetzen* | alle gezogenen Themen | alles andere |
+| *Alles löschen* (Bestätigung durch Eintippen von `LÖSCHEN`) | zusätzlich Personen, Einreichungen, Dateien, Fotos, Themen | Einstellungen (Einladungscode, Fristen) |
+
+Nach 5 falschen Admin-Passwörtern ist der Login für diese IP 15 Minuten gesperrt. Hinter einem
+Reverse-Proxy dafür `TRUST_PROXY=true` setzen, sonst teilen sich alle die IP des Proxys.
 
 Für mehrere „Handys“ an einem Rechner braucht jedes einen eigenen Cookie-Speicher, z. B.
 `http://localhost:3000/vote`, `http://127.0.0.1:3000/vote` und `http://127.0.0.2:3000/vote`

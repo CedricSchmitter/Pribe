@@ -1,5 +1,5 @@
 import { useEffect, useMemo, type CSSProperties } from 'react';
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import type { Person } from '@pribe/shared';
 import { emojiRain, fireworks, JumpText } from '../../fx';
 import { Avatar } from '../Avatar';

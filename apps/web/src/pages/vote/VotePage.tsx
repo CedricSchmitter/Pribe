@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from 'motion/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, m as motion } from 'motion/react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { API_PATHS, type Person, type PersonMeDto } from '@pribe/shared';
 import { api } from '../../lib/api';
@@ -9,9 +9,10 @@ import { RevealView } from './RevealView';
 import { useVoteGame } from './useVoteGame';
 import { VoteLogin } from './VoteLogin';
 import { VotingPanel } from './VotingPanel';
-import { MyFinale } from '../../components/finale';
 import { LobbyWaiting, ProbeWaiting, SoonWaiting } from './Waiting';
 import './vote.css';
+
+const MyFinale = lazy(() => import('../../components/finale/MyFinale').then((m) => ({ default: m.MyFinale })));
 
 type Auth = { kind: 'loading' } | { kind: 'out'; persons: Person[] } | { kind: 'in'; me: Person };
 
@@ -143,7 +144,11 @@ export function VotePage() {
         break;
       case 'finale':
         key = 'finale';
-        content = snapshot.finale ? <MyFinale me={me} finale={snapshot.finale} /> : null;
+        content = snapshot.finale ? (
+          <Suspense fallback={null}>
+            <MyFinale me={me} finale={snapshot.finale} />
+          </Suspense>
+        ) : null;
         break;
     }
   }

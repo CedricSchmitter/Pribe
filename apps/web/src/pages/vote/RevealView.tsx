@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { MyVote, Person, RevealOutcome, RevealResult } from '@pribe/shared';

@@ -4,7 +4,7 @@ import { Avatar } from '../../components/Avatar';
 import { ConnectionBadge } from '../../components/ConnectionBadge';
 import { LoginForm } from '../../components/LoginForm';
 import { ProbeBanner } from '../../components/ProbeBanner';
-import { stationsFor, type FinaleStation } from '../../components/finale';
+import { stationsFor, type FinaleStation } from '../../components/finale/stations';
 import { useAuth } from '../../lib/auth';
 import { useToast } from '../../shell';
 import { formatLeft } from '../vote/presenting';

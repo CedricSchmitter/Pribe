@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import {
   API_PATHS,
   PERSON_PASSWORD_MIN,

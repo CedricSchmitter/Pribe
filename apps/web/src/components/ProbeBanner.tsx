@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import './probeBanner.css';
 
 /** R83: unmistakable marker while the bots play in the test-run database. */

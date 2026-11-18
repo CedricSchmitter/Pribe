@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { animate, AnimatePresence, motion, useMotionValue } from 'motion/react';
+import { animate, AnimatePresence, m as motion, useMotionValue } from 'motion/react';
 import { FREE_TOPIC_TITLE, TOPICS, type TopicDto } from '@pribe/shared';
 import { burstConfetti } from '../../lib/confetti';
 import { AVATAR_COLORS } from '../admin/palette';

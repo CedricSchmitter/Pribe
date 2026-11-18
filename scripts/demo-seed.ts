@@ -1,6 +1,7 @@
 /**
  * Demo data for a local evening (`npm run demo:seed [-- --force]`): 8 persons with emoji,
- * color, password, topic and partly a photo, 5 HTML and 2 PPTX presentations from demo/.
+ * color, password, topic and half of them with a photo (photo wall, R86), 5 HTML and 2 PPTX
+ * presentations from demo/.
  * Everything goes through the real HTTP API of an in-process server on a free port, using
  * the DATA_DIR from .env / the environment. Stop `npm start` first: both would share the DB.
  */
@@ -38,11 +39,11 @@ interface DemoPerson {
 
 const PEOPLE: DemoPerson[] = [
   { name: 'Anna', emoji: '🦊', color: '#ff6633', via: 'admin', file: 'html/montage-verbieten.html' },
-  { name: 'Ben', emoji: '🐙', color: '#3366ff', via: 'admin', file: 'pptx/buero-pflanzen.pptx' },
+  { name: 'Ben', emoji: '🐙', color: '#3366ff', via: 'admin', photo: true, file: 'pptx/buero-pflanzen.pptx' },
   { name: 'Cleo', emoji: '🦄', color: '#cc33ff', via: 'register', photo: true, file: 'html/katze-als-ceo.html' },
   { name: 'Dennis', emoji: '🐸', color: '#33cc66', via: 'register', file: 'pptx/kaffeemaschine.pptx' },
   { name: 'Emma', emoji: '🐼', color: '#888888', via: 'admin', photo: true, file: 'html/meeting-nicken.html' },
-  { name: 'Finn', emoji: '🦁', color: '#f89939', via: 'register', file: 'html/socken-mythos.html' },
+  { name: 'Finn', emoji: '🦁', color: '#f89939', via: 'register', photo: true, file: 'html/socken-mythos.html' },
   { name: 'Greta', emoji: '🐝', color: '#e3a735', via: 'register', photo: true, file: 'html/perfekter-sonntag.html' },
   // Presents without a presentation of their own (R43).
   { name: 'Hugo', emoji: '🐢', color: '#2779c4', via: 'admin' },
@@ -197,6 +198,7 @@ async function main() {
       `\n${PEOPLE.length} Personen (Passwort für alle: "${DEMO_PASSWORD}"), ${PEOPLE.filter((p) => p.file).length} Einreichungen, ` +
         `Einladungscode ${DEMO_INVITE_CODE}, Einsendeschluss in 7 Tagen.\nDaten: ${config.dataDir}`,
     );
+    console.log('Fernbedienung am Handy: /remote (Admin-Passwort). Probelauf mit Bots: /admin → Probelauf; ändert diese Daten nicht.');
   } finally {
     await app.close();
   }

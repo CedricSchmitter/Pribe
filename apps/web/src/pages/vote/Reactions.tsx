@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { REACTION_EMOJIS, type ReactionEmoji } from '@pribe/shared';
 import type { CastResult } from './useVoteGame';

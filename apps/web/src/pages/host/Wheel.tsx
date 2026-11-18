@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import type { Person, WheelSpunEvent } from '@pribe/shared';
 import { Avatar } from '../../components/Avatar';
 import { emojiBurst, flash, shake, Sunburst } from '../../fx';

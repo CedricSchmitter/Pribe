@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import { useState } from 'react';
 import { API_PATHS, type Person, type PersonAuthStatusDto } from '@pribe/shared';
 import { api } from '../../lib/api';

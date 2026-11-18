@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import { Curtain, shake, sideCannons } from '../../fx';
 import { Avatar } from './Avatar';
 import { downloadPptx } from './download';

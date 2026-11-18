@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import { emojiBurst, JumpText, shake, Sunburst } from '../../fx';
 import { burstConfetti } from '../../lib/confetti';
 import { Avatar } from './Avatar';

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import type { VoteSnapshot } from '@pribe/shared';
 import { formatLeft, presentingState } from './presenting';
 import './presenterBanner.css';
