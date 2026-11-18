@@ -5,7 +5,7 @@ keep it scannable in one read (curate, don't accrete). Resolved detail moves dow
 LOG.md. Map symbols: `[ ]` open · `[~]` in progress · `[x]` done · ♻️ possibly stale
 (code changed) · ⏭️ dropped (with reason).
 
-Updated: 2026-11-17 · session 2 (Orchestrator) · drift-anchor: git `main` @ 7e053f7 (origin/main)
+Updated: 2026-11-18 · session 2 (Orchestrator) · drift-anchor: git `main` @ 2a3656e
 
 ## Mental model
 Pribe ist PowerPoint-Karaoke mit Ratespiel: Jeder reicht vorher anonym eine Präsentation
@@ -78,10 +78,10 @@ sie lokal per `git merge --no-ff` nach `main` (Nutzer-Freigabe). Nur der Orchest
 | Q3 Show-Extras | R84 Vortrags-Bewertung + Rampensau, R85 Emoji-Combo, R86 Foto-Wand | 4113/4213 | – | gemerged b81a2de |
 | Q4 Fernbedienung + „Du präsentierst!“ | R80, R82 | 4114/4214 | – | gemerged 9fb6969 |
 | Q5 Probelauf-Modus | R83 | 4115/4215 | Q1, Q3 | gemerged 5027590 |
-| Q6 Code-Splitting + Gesamttest-Update | R89, E2E/Demo um Welle 2 erweitern | 4116/4216 | alle | läuft |
+| Q6 Code-Splitting + Gesamttest-Update | R89, E2E/Demo um Welle 2 erweitern | 4116/4216 | alle | gemerged 2a3656e |
 
 ## Next concrete action
-Q6-Bericht abwarten. Pro Bericht: Gate-Subagent, `git merge --no-ff`, Nachprüfung, abhaken.
+Welle 2 komplett auf main (2a3656e): 159 Tests und Build grün. Die App läuft lokal auf :3000 (LAN-IP aktuell, steht in `.env`).
 Nach Q1+Q3 Q5 freigeben, danach Q6. Am Ende App neu bauen und starten, Nutzer für den
 Push um den temporären github.com-Login bitten, dann L11 Generalprobe.
 ## Terrain (working set)
