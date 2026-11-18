@@ -3,7 +3,6 @@ import { m as motion } from 'motion/react';
 import { emojiBurst, JumpText, shake, Sunburst } from '../../fx';
 import { burstConfetti } from '../../lib/confetti';
 import { Avatar } from './Avatar';
-import { downloadPptx } from './download';
 import type { HostGame } from './useHostGame';
 
 const DRAW_MS = 4200;
@@ -32,7 +31,6 @@ export function Drawing({ game, onError }: { game: HostGame; onError(msg: string
         if (res.error === 'WRONG_PHASE') return;
         return onError(res.message);
       }
-      if (round.submission.kind === 'pptx') downloadPptx(round.submission.url);
     }, DRAW_MS);
     return () => {
       clearTimeout(t);

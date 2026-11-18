@@ -77,8 +77,15 @@ Emoji-Combo, Probelauf und die drei Reset-Wege. Einzeln: `npm run test:e2e`.
 
 Das Handy der Spielleitung meldet sich mit `ADMIN_PASSWORD` an und steuert dasselbe Spiel wie
 der Beamer: Präsentator wählen oder Rad drehen, Ziehen, Schließen und im Finale Weiter/Zurück.
-Timer und Phase sind sichtbar. So laufen PPTX-Runden, ohne zwischen PowerPoint und Browser zu
-wechseln. Beamer und Fernbedienung sind zwei getrennte Admin-Sitzungen.
+Timer und Phase sind sichtbar. Beamer und Fernbedienung sind zwei getrennte Admin-Sitzungen.
+
+### PowerPoint im Browser (DeckCraft)
+
+`/host` spielt PPTX im Web-Build von [DeckCraft](https://github.com/storytold/deckcraft) ab
+(D32): Pfeiltasten oder Klick blättern, Esc beendet. `npm run dev` und `npm run build` laden die
+in `apps/web/scripts/fetch-deckcraft.mjs` festgelegte Version einmal nach
+`apps/web/public/deckcraft/` (nicht im Git, ~33 MB, SHA256-geprüft). Startet DeckCraft nicht
+(kein WebGPU/WebGL2), zeigt der Beamer wie früher „Läuft in PowerPoint“ mit Download-Knopf.
 
 ### Überraschungsgast
 

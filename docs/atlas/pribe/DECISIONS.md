@@ -253,3 +253,15 @@ in the chat is already lost.
   - R91 (Beenden) ist verworfen: Zurück in die Lobby hätte Uploads, das Löschen von Personen und weiteres Ziehen wieder geöffnet. Nutzer: „verwerfen wir den beenden knopf“.
 - **Alternatives rejected:** eigener Ende-Screen oder Rückkehr zur Host-Übersicht für Beenden. Eine eigene Tabelle für die Gast-Datei.
 - **Affects:** R90, R91.
+
+## D32 — PPTX im Browser mit DeckCraft, PowerPoint als Ausweichweg · 2026-11-18 · ändert D23
+- **Context:** Der Nutzer wollte PPTX wie HTML direkt im Browser zeigen, ohne Wechsel in PowerPoint.
+- **Decision:**
+  - `/host` spielt PPTX im Web-Build von [DeckCraft](https://github.com/storytold/deckcraft) (Rust/WASM, MIT oder Apache-2.0) ab. Version und SHA256 sind in `apps/web/scripts/fetch-deckcraft.mjs` fest. Das Skript läuft vor `vite`/`vite build` und legt das Bundle nach `apps/web/public/deckcraft/` (nicht im Git). So liefert Vite bzw. `@fastify/static` es unter `/deckcraft/` aus.
+  - Das iframe lädt `/deckcraft/?host=parent`. Bei `deckcraft:ready` holt `/host` die Datei vom Datei-Endpunkt, schickt sie als `deckcraft:open`, schaltet die Referentenansicht ab (`show.presenter`), startet `show.start` und fokussiert den Canvas für die Pfeiltasten.
+  - Das iframe braucht `allow-same-origin`, weil die Brücke nur mit einem Parent auf demselben Origin spricht. Es lädt eigenen Code, liest aber fremde PPTX auf dem Origin der Admin-Sitzung.
+  - Der automatische Download beim Ziehen und beim Gast entfällt. Meldet DeckCraft `deckcraft:failed` (kein WebGPU/WebGL2) oder schlägt Laden/Start fehl, zeigt `/host` wie bisher „Läuft in PowerPoint“ mit Download-Knopf.
+- **Why:** Kein Wechsel zwischen Browser und PowerPoint, Zeitlimit, Gong und Emojis bleiben sichtbar. Auf dem Pi kostet es nur Speicherplatz (~33 MB WASM); gerechnet wird im Browser des Beamer-Rechners.
+- **Alternatives rejected:** eigener PPTX-Renderer (Aufwand), JS-Bibliotheken wie PPTXjs (ungenauer), Bundle ins Git (33 MB pro Version).
+- **Risiken:** DeckCraft ist Alpha. Fremde Firmenvorlagen, SmartArt, EMF und viele Animationen sind dort ungeprüft; Calibri wird ersetzt, Emojis in Folien erscheinen als Kästchen. Nach der letzten Folie zeigt DeckCraft seine Bearbeitungsansicht.
+- **Affects:** D23 (PowerPoint nur noch Ausweichweg), L6, L11.
