@@ -26,6 +26,8 @@ export const ERROR_CODES = [
   /** R87: too many wrong admin passwords from this IP; the message names the remaining time. */
   'LOGIN_LOCKED',
   'PROBE_ACTIVE',
+  /** R90: guest switched off, without name or without a ready presentation. */
+  'GUEST_NOT_READY',
 ] as const;
 export type ErrorCode = (typeof ERROR_CODES)[number];
 
@@ -55,6 +57,7 @@ export const ERROR_MESSAGES_DE: Record<ErrorCode, string> = {
   CANNOT_RATE_SELF: 'Den eigenen Vortrag bewertest du nicht 😉',
   LOGIN_LOCKED: 'Zu viele Fehlversuche. Bitte später erneut versuchen.',
   PROBE_ACTIVE: 'Gerade läuft ein Probelauf. Erst den Probelauf beenden.',
+  GUEST_NOT_READY: 'Kein Überraschungsgast bereit (Admin → Überraschungsgast).',
 };
 
 /** Body of every non-2xx REST response and payload of failed socket acks. */

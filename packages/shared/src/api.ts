@@ -1,4 +1,4 @@
-import type { EpochMs, GameSettings, Person, SubmissionId, SubmissionKind, SubmissionStatus } from './domain';
+import type { EpochMs, GameSettings, Person, PersonId, SubmissionId, SubmissionKind, SubmissionStatus } from './domain';
 
 export const API_PATHS = {
   health: '/api/health',
@@ -28,6 +28,12 @@ export const API_PATHS = {
     probe: '/api/admin/probe',
     probeStart: '/api/admin/probe/start',
     probeStop: '/api/admin/probe/stop',
+    /** GET `AdminGuestDto`, PUT `GuestInput` (R90). */
+    guest: '/api/admin/guest',
+    /** PUT multipart field `photo`, DELETE removes it; both return `AdminGuestDto`. */
+    guestPhoto: '/api/admin/guest/photo',
+    /** POST multipart field `file` (like a normal upload), DELETE removes it; both return `AdminGuestDto`. */
+    guestPresentation: '/api/admin/guest/presentation',
   },
   /** Open endpoints for phones (P2). */
   persons: '/api/persons',
@@ -147,6 +153,23 @@ export interface SubmissionOverviewItem {
 
 export interface ProbeStatusDto {
   active: boolean;
+}
+
+/**
+ * Surprise guest (R90). Either an existing person (`personId`) or an own entry with name,
+ * emoji, color and photo; an own entry is no player and cannot log in or vote.
+ */
+export interface AdminGuestDto {
+  enabled: boolean;
+  personId: PersonId | null;
+  name: string;
+  emoji: string;
+  color: string;
+  /** Photo of the own entry; a picked person brings their own. */
+  photoUrl: string | null;
+  presentation: { kind: SubmissionKind; status: SubmissionStatus; error: string | null } | null;
+  /** On, with a name and a ready presentation: the finale offers the guest. */
+  ready: boolean;
 }
 
 /** Deleted row counts of a reset (R88); fields a reset does not touch are 0. */

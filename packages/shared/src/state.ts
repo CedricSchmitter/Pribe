@@ -64,6 +64,20 @@ export interface MyVote {
   talkStars: number | null;
 }
 
+/** R90: surprise guest after the finale; not a player, so no id that votes or scores could use. */
+export interface GuestView {
+  name: string;
+  emoji: string;
+  color: string;
+  photoUrl: string | null;
+  /** `null` during the reveal; the talk has no time limit. */
+  presentingSince: EpochMs | null;
+}
+
+export interface HostGuestView extends GuestView {
+  presentation: { id: SubmissionId; kind: SubmissionKind; url: string };
+}
+
 export interface SnapshotBase {
   phase: GamePhase;
   /** Lets clients correct their clock for countdowns. */
@@ -80,6 +94,8 @@ export interface SnapshotBase {
   finale: FinaleResult | null;
   /** R83: a test run with bots in a separate database; real phones only see a hint. */
   probe: boolean;
+  /** Only set in phase `guest`. */
+  guest: GuestView | null;
 }
 
 export interface HostSnapshot extends SnapshotBase {
@@ -92,6 +108,13 @@ export interface HostSnapshot extends SnapshotBase {
    * The client clamps it to its station list; 0 outside the finale.
    */
   finaleStep?: number;
+  /** Only set in phase `guest`. */
+  guest: HostGuestView | null;
+  /**
+   * R90: the guest is switched on, has a name and a ready presentation, so „Weiter“ on the
+   * finale's last station brings the guest on. Host only, the phones must not see it coming.
+   */
+  guestReady: boolean;
 }
 
 export interface VoteSnapshot extends SnapshotBase {

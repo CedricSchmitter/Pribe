@@ -1,5 +1,6 @@
 import { m as motion } from 'motion/react';
-import type { Person } from '@pribe/shared';
+import type { GuestView, Person } from '@pribe/shared';
+import { Avatar as PlainAvatar } from '../../components/Avatar';
 import { FloatingEmojis, JumpText } from '../../fx';
 import { Avatar } from './Avatar';
 
@@ -52,6 +53,32 @@ export function SoonWaiting({ presenter, drawing }: { presenter: Person | null; 
       )}
       <p className="muted">Sobald die Präsentation startet, kannst du tippen.</p>
       <Dots />
+    </div>
+  );
+}
+
+/** R90: the surprise guest is on stage; there is nothing to vote on. */
+export function GuestWaiting({ guest }: { guest: GuestView }) {
+  const talking = guest.presentingSince !== null;
+  return (
+    <div className="vote-page center vote-waiting">
+      <FloatingEmojis emojis={[guest.emoji, '🎁', '🤯', '✨']} count={12} seed={5} />
+      <motion.div
+        initial={{ scale: 0, rotate: 720 }}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ type: 'spring', stiffness: 80, damping: 9 }}
+      >
+        <motion.div animate={{ y: [0, -18, 0], rotate: [-6, 6, -6] }} transition={{ ...BOUNCE, duration: 1.2 }}>
+          <PlainAvatar person={guest} size={128} />
+        </motion.div>
+      </motion.div>
+      <h1>
+        <JumpText text="Überraschungsgast!" />
+      </h1>
+      <p className="vote-pool">
+        <strong>{guest.name}</strong> {talking ? 'präsentiert – einfach genießen 🍿' : 'betritt die Bühne …'}
+      </p>
+      <p className="muted">Hier wird nicht getippt und nicht bewertet.</p>
     </div>
   );
 }

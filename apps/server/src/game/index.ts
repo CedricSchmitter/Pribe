@@ -77,7 +77,8 @@ export function registerGame(
   let finaleStep = 0;
   const hostSnapshot = (): HostSnapshot => {
     const snap = engine.hostSnapshot(connectedPersonIds());
-    if (snap.phase !== 'finale') finaleStep = 0;
+    // The guest (R90) follows the last station, so going back from it lands there again.
+    if (snap.phase !== 'finale' && snap.phase !== 'guest') finaleStep = 0;
     return { ...snap, finaleStep };
   };
 
@@ -123,6 +124,9 @@ export function registerGame(
   };
   ctx.stateEvents.on('world', onWorldSwitch);
 
+  // A guest PPTX turning ready changes `guestReady` on the host (R90).
+  const offConversion = ctx.conversion.onStatusChange(() => broadcastHost());
+
   /** Shared by phones and test-run bots; `null` when the reaction went out. */
   const sendReaction = (throttleKey: string, personId: PersonId | null, emoji: ReactionEmoji): ErrorCode | null => {
     const phase = engine.phase();
@@ -155,6 +159,9 @@ export function registerGame(
     socket.on('round:close', run(() => engine.closeRound()));
     socket.on('round:next', run(() => engine.next()));
     socket.on('finale:start', run(() => engine.startFinale()));
+    socket.on('guest:start', run(() => engine.startGuest()));
+    socket.on('guest:present', run(() => engine.presentGuest()));
+    socket.on('guest:back', run(() => engine.leaveGuest()));
     socket.on('finale:step', (payload, ack) => {
       const p = parse(FinaleStepPayloadSchema, payload);
       if (!p) return reject(ack, 'INVALID_PAYLOAD');
@@ -230,6 +237,7 @@ export function registerGame(
     dispose() {
       ctx.stateEvents.off('changed', onExternalChange);
       ctx.stateEvents.off('world', onWorldSwitch);
+      offConversion();
       changeListeners.clear();
       engine.dispose();
     },

@@ -25,7 +25,7 @@ export type SubmissionStatus = (typeof SUBMISSION_STATUSES)[number];
 
 /**
  * Lobby → choosePresenter (manual or wheel) → drawing → presenting (voting open)
- * → countdown (voting still open) → reveal → choosePresenter … → finale.
+ * → countdown (voting still open) → reveal → choosePresenter … → finale → guest (R90, optional).
  */
 export const GAME_PHASES = [
   'lobby',
@@ -35,6 +35,7 @@ export const GAME_PHASES = [
   'countdown',
   'reveal',
   'finale',
+  'guest',
 ] as const;
 export type GamePhase = (typeof GAME_PHASES)[number];
 

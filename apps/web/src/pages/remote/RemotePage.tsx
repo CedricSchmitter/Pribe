@@ -19,6 +19,7 @@ const PHASE_LABELS: Record<GamePhase, string> = {
   countdown: 'Letzte Tipps',
   reveal: 'Auflösung',
   finale: 'Finale',
+  guest: 'Überraschungsgast',
 };
 
 /** Beamer draw show (Drawing.tsx) plus a margin; only then is a stuck draw likely a missing beamer. */
@@ -166,6 +167,28 @@ function Remote({ game, snap }: { game: HostGame; snap: HostSnapshot }) {
           </>
         )}
         {snap.phase === 'finale' && snap.finale && <FinaleControls game={game} snap={snap} run={run} />}
+        {snap.phase === 'guest' && snap.guest && (
+          <>
+            <div className="remote-presenter">
+              <Avatar person={snap.guest} size={48} />
+              <div>
+                <div className="label">Überraschungsgast</div>
+                <div className="remote-presenter-name">
+                  {snap.guest.name} {snap.guest.presentingSince === null ? 'wird enthüllt' : 'präsentiert (ohne Zeitlimit)'}
+                </div>
+              </div>
+            </div>
+            {snap.guest.presentingSince === null ? (
+              <button type="button" className="primary remote-big" disabled={busy} onClick={cmd('guest:present')}>
+                🎤 Bühne frei
+              </button>
+            ) : (
+              <button type="button" className="remote-big" disabled={busy} onClick={cmd('guest:back')}>
+                ⬅️ Zurück zum Finale
+              </button>
+            )}
+          </>
+        )}
       </section>
     </div>
   );
@@ -265,6 +288,7 @@ function FinaleControls({
   const stations = stationsFor(snap.finale!);
   const step = Math.min(Math.max(snap.finaleStep ?? 0, 0), stations.length - 1);
   const go = (s: number) => void run(() => game.finaleStep(s));
+  const last = step >= stations.length - 1;
   return (
     <>
       <div className="remote-station">
@@ -277,11 +301,17 @@ function FinaleControls({
         <button type="button" className="remote-big" disabled={step === 0} onClick={() => go(step - 1)}>
           ⬅️ Zurück
         </button>
-        <button type="button" className="primary remote-big" disabled={step >= stations.length - 1} onClick={() => go(step + 1)}>
-          Weiter ➡️
-        </button>
+        {last && snap.guestReady ? (
+          <button type="button" className="primary remote-big" onClick={() => void run(() => game.command('guest:start'))}>
+            🎁 Überraschungsgast
+          </button>
+        ) : (
+          <button type="button" className="primary remote-big" disabled={last} onClick={() => go(step + 1)}>
+            Weiter ➡️
+          </button>
+        )}
       </div>
-      {step === stations.length - 1 && (
+      {last && (
         <button type="button" className="remote-big" onClick={() => go(0)}>
           🔁 Finale von vorn
         </button>

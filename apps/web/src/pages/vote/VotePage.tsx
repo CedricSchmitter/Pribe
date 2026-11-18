@@ -9,7 +9,7 @@ import { RevealView } from './RevealView';
 import { useVoteGame } from './useVoteGame';
 import { VoteLogin } from './VoteLogin';
 import { VotingPanel } from './VotingPanel';
-import { LobbyWaiting, ProbeWaiting, SoonWaiting } from './Waiting';
+import { GuestWaiting, LobbyWaiting, ProbeWaiting, SoonWaiting } from './Waiting';
 import './vote.css';
 
 const MyFinale = lazy(() => import('../../components/finale/MyFinale').then((m) => ({ default: m.MyFinale })));
@@ -149,6 +149,10 @@ export function VotePage() {
             <MyFinale me={me} finale={snapshot.finale} />
           </Suspense>
         ) : null;
+        break;
+      case 'guest':
+        key = 'guest';
+        content = snapshot.guest ? <GuestWaiting guest={snapshot.guest} /> : null;
         break;
     }
   }

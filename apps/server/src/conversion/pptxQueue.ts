@@ -47,7 +47,7 @@ export function createPptxQueue(opts: PptxQueueOptions): ConversionQueue {
 
 /** Re-enqueues submissions still `converting`, e.g. after a restart (R4). */
 export function resumeConversions(queue: ConversionQueue, submissions: SubmissionsRepo, filesDir: string): number {
-  const pending = submissions.list().filter((s) => s.status === 'converting');
+  const pending = submissions.listConverting();
   for (const s of pending) {
     if (!s.filePath) {
       submissions.updateStatus(s.id, { status: 'failed', error: BROKEN_FILE });

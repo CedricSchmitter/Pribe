@@ -36,14 +36,14 @@ const toStatusDto = (s: SubmissionRecord): SubmissionStatusDto => ({
   error: s.error,
 });
 
-function uploadTypeOf(filename: string | undefined): SubmissionKind | null {
+export function uploadTypeOf(filename: string | undefined): SubmissionKind | null {
   const ext = path.extname(filename ?? '').toLowerCase();
   if (!(ACCEPTED_UPLOAD_EXTENSIONS as readonly string[]).includes(ext)) return null;
   return ext === '.pptx' ? 'pptx' : 'html';
 }
 
 /** Cheap content check so a renamed binary or random text is rejected early. */
-async function contentMatches(file: string, type: SubmissionKind): Promise<boolean> {
+export async function contentMatches(file: string, type: SubmissionKind): Promise<boolean> {
   const handle = await open(file, 'r');
   try {
     const buf = Buffer.alloc(8192);
@@ -57,7 +57,7 @@ async function contentMatches(file: string, type: SubmissionKind): Promise<boole
   }
 }
 
-function isFileTooLarge(err: unknown): boolean {
+export function isFileTooLarge(err: unknown): boolean {
   return (err as { code?: string } | null)?.code === 'FST_REQ_FILE_TOO_LARGE';
 }
 

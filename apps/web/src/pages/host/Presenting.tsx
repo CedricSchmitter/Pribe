@@ -1,9 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import { m as motion } from 'motion/react';
+import { useEffect, useState } from 'react';
 import { Curtain, shake, sideCannons } from '../../fx';
-import { Avatar } from './Avatar';
-import { downloadPptx } from './download';
 import { audioReady, scheduleGong, unlockAudio } from './gong';
+import { PresentationFrame } from './PresentationFrame';
 import { ReactionOverlay } from './ReactionOverlay';
 import { TimeBar } from './TimeBar';
 import type { HostGame } from './useHostGame';
@@ -12,7 +10,6 @@ export function Presenting({ game, onError }: { game: HostGame; onError(msg: str
   const snap = game.snapshot!;
   const round = snap.round!;
   const presenter = game.person(round.presenterId);
-  const iframe = useRef<HTMLIFrameElement>(null);
   const [soundOn, setSoundOn] = useState(audioReady());
   // Only a fresh start gets the curtain; a reload mid-talk must not cover the slides again.
   const [curtain, setCurtain] = useState(() => !!round.startedAt && game.now() - round.startedAt < 4000);
@@ -42,40 +39,12 @@ export function Presenting({ game, onError }: { game: HostGame; onError(msg: str
 
   return (
     <div className="host-presenting">
-      {round.submission.kind === 'html' ? (
-        <iframe
-          ref={iframe}
-          className="host-iframe"
-          title="Präsentation"
-          src={round.submission.url}
-          sandbox="allow-scripts"
-          onLoad={() => iframe.current?.focus()}
-        />
-      ) : (
-        <div className="host-pptx">
-          <motion.div
-            className="host-pptx-icon"
-            animate={{ rotate: [0, -8, 8, -8, 0], scale: [1, 1.1, 1] }}
-            transition={{ repeat: Infinity, duration: 2.4 }}
-          >
-            🎤
-          </motion.div>
-          <h1>Läuft in PowerPoint</h1>
-          <div className="host-pptx-presenter">
-            <Avatar person={presenter} size={72} /> <span>{presenter?.name} präsentiert</span>
-          </div>
-          <ol className="host-pptx-steps">
-            <li>Datei unten in der Download-Leiste öffnen</li>
-            <li>
-              <kbd>F5</kbd> drücken – Bühne frei!
-            </li>
-            <li>Danach zurück in den Browser und „Schließen“ klicken</li>
-          </ol>
-          <button type="button" className="host-big-button" onClick={() => downloadPptx(round.submission.url)}>
-            ⬇️ Erneut herunterladen
-          </button>
-        </div>
-      )}
+      <PresentationFrame
+        kind={round.submission.kind}
+        url={round.submission.url}
+        speaker={presenter}
+        afterwards="Danach zurück in den Browser und „Schließen“ klicken"
+      />
       {round.timeLimitEndsAt && round.startedAt && <TimeBar startedAt={round.startedAt} endsAt={round.timeLimitEndsAt} now={game.now} />}
       <ReactionOverlay reactions={game.reactions} combo={game.combo} person={game.person} />
       {curtain && <Curtain />}

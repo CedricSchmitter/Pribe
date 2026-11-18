@@ -3,7 +3,16 @@ import type { Ack, ComboEvent, HostSnapshot, Person, PersonId, ReactionEvent, Wh
 import { createHostSocket } from '../../lib/socket';
 import { useSocket } from '../../lib/useSocket';
 
-export type HostCommand = 'game:start' | 'presenter:spin' | 'round:start' | 'round:close' | 'round:next' | 'finale:start';
+export type HostCommand =
+  | 'game:start'
+  | 'presenter:spin'
+  | 'round:start'
+  | 'round:close'
+  | 'round:next'
+  | 'finale:start'
+  | 'guest:start'
+  | 'guest:present'
+  | 'guest:back';
 
 export interface HostGame {
   snapshot: HostSnapshot | null;

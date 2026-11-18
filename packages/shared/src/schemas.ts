@@ -42,6 +42,18 @@ export const RegisterRequestSchema = PersonInputSchema.extend({
 });
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
 
+/** R90: partial update; an empty name means "not set yet". */
+export const GuestInputSchema = z
+  .object({
+    enabled: z.boolean(),
+    personId: PersonIdSchema.nullable(),
+    name: z.string().trim().max(40),
+    emoji: PersonInputSchema.shape.emoji,
+    color: PersonInputSchema.shape.color,
+  })
+  .partial();
+export type GuestInput = z.infer<typeof GuestInputSchema>;
+
 /** The word the admin types to confirm „Alles löschen“ (D30). */
 export const RESET_ALL_CONFIRMATION = 'LÖSCHEN';
 

@@ -5,6 +5,7 @@ import { LoginForm } from '../../components/LoginForm';
 import { ProbeBanner } from '../../components/ProbeBanner';
 import { api } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
+import { GuestPanel } from './GuestPanel';
 import { PersonsPanel } from './PersonsPanel';
 import { ProbePanel } from './ProbePanel';
 import { ResetPanel } from './ResetPanel';
@@ -59,6 +60,7 @@ export function AdminPage() {
             {probe !== null && <ProbePanel active={probe} onChange={setProbe} />}
             <SettingsPanel key={`settings-${world}`} />
             <SubmissionsPanel key={`submissions-${world}`} />
+            <GuestPanel key={`guest-${world}`} />
             <ResetPanel onReset={() => setResets((n) => n + 1)} />
           </div>
         </div>

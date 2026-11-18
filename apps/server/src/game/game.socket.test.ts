@@ -192,4 +192,53 @@ describe('game over sockets', () => {
     expect(states).toEqual([]);
     expect(repos.game.get().phase).toBe('lobby');
   });
+
+  it('surprise guest: reveal, talk and the way back reach host and phones (R90)', async () => {
+    const { repos, ownerHash } = built.ctx;
+    const anna = repos.persons.create({ name: 'Anna', emoji: '🙂', color: '#abcdef' });
+    const ben = repos.persons.create({ name: 'Ben', emoji: '🙂', color: '#abcdef' });
+    repos.submissions.replaceForOwner({ ownerHash: ownerHash(anna.id), kind: 'html', status: 'ready', filePath: 'x.html' });
+    repos.guest.update({ enabled: true, name: 'Die Chefin', emoji: '🎩', color: '#ffd000' });
+    const guestSub = repos.submissions.replaceGuest({ kind: 'html', status: 'ready', filePath: 'g.html' }).submission;
+
+    const login = await built.app.inject({ method: 'POST', url: API_PATHS.auth.login, payload: { password: 'test-password' } });
+    const c = login.cookies.find((x) => x.name === SESSION_COOKIE_NAME)!;
+    const host = await open(SOCKET_NAMESPACES.host, `${c.name}=${c.value}`);
+    const phone = await open(SOCKET_NAMESPACES.vote);
+    const phoneSnaps: VoteSnapshot[] = [];
+    phone.on('state', (s: VoteSnapshot) => phoneSnaps.push(s));
+
+    expect(await call(host, 'game:start')).toEqual({ ok: true });
+    expect(await call(host, 'round:draw', { presenterId: ben.id })).toEqual({ ok: true });
+    expect(await call(host, 'round:start')).toEqual({ ok: true });
+    expect(await call(host, 'guest:start')).toMatchObject({ ok: false, error: 'WRONG_PHASE' });
+    expect(await call(host, 'round:close')).toEqual({ ok: true });
+    built.ctx.repos.game.save('reveal', {});
+    expect(await call(host, 'finale:start')).toEqual({ ok: true });
+    expect(await call(host, 'finale:step', { step: 3 })).toEqual({ ok: true });
+
+    const hostGuest = nextState<HostSnapshot>(host, 'guest');
+    const phoneGuest = nextState<VoteSnapshot>(phone, 'guest');
+    expect(await call(host, 'guest:start')).toEqual({ ok: true });
+    expect((await hostGuest).guest?.presentation.id).toBe(guestSub.id);
+    expect((await phoneGuest).guest).toMatchObject({ name: 'Die Chefin', presentingSince: null });
+
+    expect(await call(host, 'guest:present')).toEqual({ ok: true });
+    const talking = await call<HostSnapshot>(host, 'state:request');
+    if (!talking.ok) throw new Error(talking.error);
+    expect(talking.data.guest?.presentingSince).toEqual(expect.any(Number));
+
+    expect(await call(host, 'finale:step', { step: 7 })).toMatchObject({ ok: false, error: 'WRONG_PHASE' });
+    const back = nextState<VoteSnapshot>(phone, 'finale');
+    expect(await call(host, 'guest:back')).toEqual({ ok: true });
+    expect((await back).roundCount).toBe(1);
+    const finale = await call<HostSnapshot>(host, 'state:request');
+    if (!finale.ok) throw new Error(finale.error);
+    expect(finale.data.finaleStep).toBe(3);
+    // The phones learn about the guest only once it is on stage, and never get its file.
+    const json = JSON.stringify(phoneSnaps);
+    expect(json).not.toContain(guestSub.id);
+    expect(json).not.toContain('guestReady');
+    expect(phoneSnaps.filter((s) => s.phase !== 'guest').every((s) => s.guest === null)).toBe(true);
+  });
 });

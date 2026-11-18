@@ -61,6 +61,8 @@ Emoji-Combo, Probelauf und die drei Reset-Wege. Einzeln: `npm run test:e2e`.
 - Reicht über die echte Upload-API 5 HTML-Präsentationen (`demo/html/`, Pfeiltasten und
   Klick zum Blättern) und 2 PowerPoint-Dateien (`demo/pptx/`) ein. Hugo hat keine eigene
   Präsentation und darf trotzdem präsentieren.
+- Legt *Professor Pribe* als Überraschungsgast an (eigener Eintrag mit Foto, eingeschaltet)
+  und lädt `demo/html/ueberraschungsgast.html` als seine Präsentation hoch.
 - Die PPTX tragen absichtlich Autor-Metadaten. Das Skript prüft, dass sie nach dem Upload
   leer sind und der Download-Name nur ein Hash ist.
 - Einsendeschluss in 7 Tagen, Zeitlimit 3 Minuten, Vote-Countdown 20 Sekunden.
@@ -78,10 +80,20 @@ der Beamer: Präsentator wählen oder Rad drehen, Ziehen, Schließen und im Fina
 Timer und Phase sind sichtbar. So laufen PPTX-Runden, ohne zwischen PowerPoint und Browser zu
 wechseln. Beamer und Fernbedienung sind zwei getrennte Admin-Sitzungen.
 
+### Überraschungsgast
+
+In `/admin` → *Überraschungsgast* wählt die Spielleitung eine vorhandene Person oder legt einen
+eigenen Eintrag an (Name, Emoji/Farbe, Foto). Ein eigener Eintrag spielt nicht mit: kein Login,
+keine Tipps, nicht in Rangliste und Awards. Die Gast-Präsentation (HTML oder PPTX, gleiche
+Prüfung und Metadaten-Bereinigung wie beim Einreichen) liegt nie im Pool, zählt nicht bei den
+Einreichungen und ergibt keine Runde. Ist der Gast eingeschaltet und die Präsentation fertig,
+führt *Weiter* nach der Foto-Wand zur Enthüllung und danach zum Vortrag ohne Zeitlimit.
+*Zurück zum Finale* (Beamer und `/remote`) kehrt zur Foto-Wand zurück.
+
 ### Probelauf
 
-In `/admin` → *Probelauf* startet ein Testspiel mit 5 Bots und den Demo-Präsentationen aus
-`demo/`. Er läuft in einer eigenen, temporären Datenbank unter `DATA_DIR/probelauf`. Echte
+In `/admin` → *Probelauf* startet ein Testspiel mit 5 Bots, den Demo-Präsentationen aus
+`demo/` und einem eingeschalteten Überraschungsgast. Er läuft in einer eigenen, temporären Datenbank unter `DATA_DIR/probelauf`. Echte
 Personen, Einreichungen, Themen und der Spielstand bleiben unverändert. Beamer, Fernbedienung
 und Handys zeigen dabei einen Hinweis. *Probelauf beenden* (oder ein Neustart des Servers)
 kehrt zum echten Spiel zurück und löscht das Verzeichnis. Solange er läuft, sind die
@@ -91,9 +103,9 @@ Reset-Wege gesperrt.
 
 | Knopf | Löscht | Bleibt |
 | --- | --- | --- |
-| *Spiel zurücksetzen* | Runden, Votes, Spielstand (zurück in die Lobby) | Personen, Einreichungen, Themen, Einstellungen |
+| *Spiel zurücksetzen* | Runden, Votes, Spielstand (zurück in die Lobby) | Personen, Einreichungen, Themen, Überraschungsgast, Einstellungen |
 | *Themen zurücksetzen* | alle gezogenen Themen | alles andere |
-| *Alles löschen* (Bestätigung durch Eintippen von `LÖSCHEN`) | zusätzlich Personen, Einreichungen, Dateien, Fotos, Themen | Einstellungen (Einladungscode, Fristen) |
+| *Alles löschen* (Bestätigung durch Eintippen von `LÖSCHEN`) | zusätzlich Personen, Einreichungen, Dateien, Fotos, Themen, Überraschungsgast samt Präsentation | Einstellungen (Einladungscode, Fristen) |
 
 Nach 5 falschen Admin-Passwörtern ist der Login für diese IP 15 Minuten gesperrt. Hinter einem
 Reverse-Proxy dafür `TRUST_PROXY=true` setzen, sonst teilen sich alle die IP des Proxys.
