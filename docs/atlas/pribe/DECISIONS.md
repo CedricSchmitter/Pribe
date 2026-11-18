@@ -241,3 +241,15 @@ in the chat is already lost.
     - Der Probelauf läuft in einer getrennten Datenbank (temporär) mit Server-Bots.
 - **Alternatives rejected:** siehe „nicht gewählt“.
 - **Affects:** R80–R89.
+
+## D31 — Welle 3: Überraschungsgast, Beenden verworfen · 2026-11-18
+- **Context:** Der Nutzer wollte einen Überraschungsgast nach dem Finale und einen Beenden-Knopf am Ende.
+- **Decision:**
+  - Neue Phase `guest` nach dem Finale. Die Host-Befehle sind `guest:start`, `guest:present` und `guest:back`. „Zurück zum Finale“ führt auf die Foto-Wand.
+  - Die Gast-Präsentation ist eine Zeile in `submissions` mit `guest = 1` und dem festen Owner-Hash `'guest'`, den kein HMAC erzeugen kann. Pool, Admin-Übersicht und Zähler filtern `guest = 0`. Sie wird nie eine Runde und hat kein Zeitlimit.
+  - Die Gast-Daten liegen in einer eigenen einzeiligen Tabelle `guest`. Ein dort angelegter Gast spielt nicht mit. Wird eine Person als Gast gewählt, gelten ihr Name und Foto. Wird sie gelöscht, fällt der Gast auf den eigenen Eintrag zurück.
+  - Die Handys erfahren vom Gast erst, wenn er auf der Bühne steht, und bekommen die Datei nie.
+  - „Spiel zurücksetzen“ behält den Gast. „Alles löschen“ entfernt ihn samt Datei und Foto.
+  - R91 (Beenden) ist verworfen: Zurück in die Lobby hätte Uploads, das Löschen von Personen und weiteres Ziehen wieder geöffnet. Nutzer: „verwerfen wir den beenden knopf“.
+- **Alternatives rejected:** eigener Ende-Screen oder Rückkehr zur Host-Übersicht für Beenden. Eine eigene Tabelle für die Gast-Datei.
+- **Affects:** R90, R91.

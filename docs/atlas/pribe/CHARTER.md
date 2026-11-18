@@ -146,6 +146,11 @@ IDs (R..) werden in STATE.md und DECISIONS.md referenziert.
   Votes, Spielstand; Personen, Einreichungen, Themen bleiben), *Themen zurücksetzen*,
   *Alles löschen* (zusätzlich Personen, Einreichungen, Dateien, Avatare, Themen).
 - **R89** Frontend in Teilen laden (Code-Splitting pro Seite).
+- **R90** Überraschungsgast: Der Admin wählt eine Person oder legt einen eigenen Gast an
+  (Name + Foto/Emoji, spielt nicht mit), schaltet ihn ein und hinterlegt eine eigene
+  Präsentation (nicht im Pool, keine Runde, keine Abstimmung, kein Zeitlimit). Nach dem
+  Finale folgen Enthüllung und Vortrag des Gasts.
+- ⏭️ **R91** Beenden-Knopf am Ende des Finales — verworfen (Lobby würde Uploads/Löschen/Ziehen wieder öffnen; Nutzer: „verwerfen wir den beenden knopf“).
 
 ## OUT OF SCOPE
 - Echte Logins für Spieler; echte Anonymität gegenüber jemandem mit Zugriff auf DB **und**

@@ -5,7 +5,7 @@ keep it scannable in one read (curate, don't accrete). Resolved detail moves dow
 LOG.md. Map symbols: `[ ]` open · `[~]` in progress · `[x]` done · ♻️ possibly stale
 (code changed) · ⏭️ dropped (with reason).
 
-Updated: 2026-11-18 · session 2 (Orchestrator) · drift-anchor: git `main` @ 2a3656e
+Updated: 2026-11-18 · session 3 (Orchestrator) · drift-anchor: git `main` @ 10cc0ce
 
 ## Mental model
 Pribe ist PowerPoint-Karaoke mit Ratespiel: Jeder reicht vorher anonym eine Präsentation
@@ -80,10 +80,15 @@ sie lokal per `git merge --no-ff` nach `main` (Nutzer-Freigabe). Nur der Orchest
 | Q5 Probelauf-Modus | R83 | 4115/4215 | Q1, Q3 | gemerged 5027590 |
 | Q6 Code-Splitting + Gesamttest-Update | R89, E2E/Demo um Welle 2 erweitern | 4116/4216 | alle | gemerged 2a3656e |
 
+## Welle 3 (R90–R91) — Orchestrator merged lokal nach Freigabe des Nutzers (2026-11-18)
+| Paket | Inhalt | Ports | Stand |
+|---|---|---|---|
+| Q7 Überraschungsgast | R90 (R91 Beenden verworfen) | 4117/4217 | gemerged 10cc0ce |
+
+R91 verworfen: „zurück in die Lobby“ hätte Uploads, Personen-Löschen und weiteres Ziehen wieder geöffnet. Entscheidungen → D31. Ungeprüft: Gast im Probelauf im Browser, PPTX-Gast am Beamer, Enthüllungs-Titel in 1920×1080.
+
 ## Next concrete action
-Welle 2 komplett auf main (2a3656e): 159 Tests und Build grün. Die App läuft lokal auf :3000 (LAN-IP aktuell, steht in `.env`).
-Nach Q1+Q3 Q5 freigeben, danach Q6. Am Ende App neu bauen und starten, Nutzer für den
-Push um den temporären github.com-Login bitten, dann L11 Generalprobe.
+Welle 3 (R90) ist auf main (10cc0ce). Als Nächstes die App auf :3000 neu bauen und neu starten (neue Migration), den Gast gemeinsam testen und für den Push den temporären github.com-Login vom Nutzer holen. Danach folgt L11 Generalprobe.
 ## Terrain (working set)
 - `docs/atlas/pribe/` — Missionsgedächtnis (CHARTER = R.., DECISIONS = D.., DESIGN = Optik/Shell)
 - `apps/server/src/` — `game/` (Echtzeit), `conversion/` (PPTX-Bereinigung), `routes/` (admin, submit, person, files, host), `db/`
