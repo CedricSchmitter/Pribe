@@ -15,6 +15,7 @@ import { Reveal } from './Reveal';
 import { useHostGame } from './useHostGame';
 import './host.css';
 
+const GuestShow = lazy(() => import('./GuestShow').then((m) => ({ default: m.GuestShow })));
 const FinaleShow = lazy(() => import('../../components/finale/FinaleShow').then((m) => ({ default: m.FinaleShow })));
 
 /** Beamer view (L6). State comes from the server on every (re)connect, so a reload resumes the show. */
@@ -68,7 +69,13 @@ export function HostPage() {
           persons={s.persons}
           step={s.finaleStep ?? 0}
           onStep={(step) => void game.finaleStep(step).then((res) => !res.ok && onError(res.message))}
+          guestReady={s.guestReady}
+          onGuest={() => void game.command('guest:start').then((res) => !res.ok && onError(res.message))}
         />
+      </Suspense>
+    ) : phase === 'guest' && s.guest ? (
+      <Suspense fallback={null}>
+        <GuestShow game={game} guest={s.guest} onError={onError} />
       </Suspense>
     ) : null;
 

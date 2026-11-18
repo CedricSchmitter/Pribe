@@ -1,7 +1,7 @@
 /**
  * Demo data for a local evening (`npm run demo:seed [-- --force]`): 8 persons with emoji,
  * color, password, topic and half of them with a photo (photo wall, R86), 5 HTML and 2 PPTX
- * presentations from demo/.
+ * presentations from demo/, plus a surprise guest (R90) with photo and presentation, switched on.
  * Everything goes through the real HTTP API of an in-process server on a free port, using
  * the DATA_DIR from .env / the environment. Stop `npm start` first: both would share the DB.
  */
@@ -13,6 +13,7 @@ import { strFromU8, unzipSync } from 'fflate';
 import {
   API_PATHS,
   RESET_ALL_CONFIRMATION,
+  type AdminGuestDto,
   type AdminPersonDto,
   type Person,
   type PersonMeDto,
@@ -36,6 +37,8 @@ interface DemoPerson {
   photo?: boolean;
   file?: string;
 }
+
+const GUEST = { name: 'Professor Pribe', emoji: '🎩', color: '#ffd000', file: 'html/ueberraschungsgast.html' };
 
 const PEOPLE: DemoPerson[] = [
   { name: 'Anna', emoji: '🦊', color: '#ff6633', via: 'admin', file: 'html/montage-verbieten.html' },
@@ -175,6 +178,17 @@ async function main() {
       }
       console.log(line);
     }
+
+    // Surprise guest (R90): an own entry, not a player.
+    await call('PUT', API_PATHS.admin.guest, { cookie: admin, json: { enabled: true, personId: null, name: GUEST.name, emoji: GUEST.emoji, color: GUEST.color } });
+    const guestPhoto = new FormData();
+    guestPhoto.append('photo', new Blob([avatarPng(GUEST.color)], { type: 'image/png' }), 'guest.png');
+    await call('PUT', API_PATHS.admin.guestPhoto, { cookie: admin, form: guestPhoto });
+    const guestFile = new FormData();
+    guestFile.append('file', new Blob([readFileSync(`${DEMO_DIR}${GUEST.file}`)]), GUEST.file.split('/').pop()!);
+    const guest = (await call<AdminGuestDto>('POST', API_PATHS.admin.guestPresentation, { cookie: admin, form: guestFile })).body;
+    if (!guest.ready) throw new Error('Überraschungsgast ist nicht bereit');
+    console.log(`${GUEST.emoji} ${GUEST.name} als Überraschungsgast (eingeschaltet, ${guest.presentation?.kind}).`);
 
     // PPTX: wait for the metadata cleanup and check what the beamer would download (D23).
     for (const id of pptxIds) {

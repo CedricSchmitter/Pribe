@@ -13,7 +13,7 @@ const RESETS: Record<
 > = {
   game: {
     label: 'Spiel zurücksetzen …',
-    hint: 'Wie frisch gestartet: Runden, Tipps und Spielstand weg. Personen, Einreichungen und Themen bleiben.',
+    hint: 'Wie frisch gestartet: Runden, Tipps und Spielstand weg. Personen, Einreichungen, Themen und Überraschungsgast bleiben.',
     emoji: '🔄',
     question: 'Spiel zurücksetzen?',
     detail:
@@ -32,11 +32,11 @@ const RESETS: Record<
   },
   all: {
     label: 'Alles löschen …',
-    hint: 'Zusätzlich Personen, Einreichungen, Dateien, Fotos und Themen. Einladungscode und Fristen bleiben.',
+    hint: 'Zusätzlich Personen, Einreichungen, Dateien, Fotos, Themen und Überraschungsgast. Einladungscode und Fristen bleiben.',
     emoji: '💣',
     question: 'Wirklich alles löschen?',
     detail:
-      'Personen, Einreichungen samt Dateien, Fotos, Themen, Runden und Tipps werden gelöscht. Nur die Einstellungen bleiben.',
+      'Personen, Einreichungen samt Dateien, Fotos, Themen, Überraschungsgast, Runden und Tipps werden gelöscht. Nur die Einstellungen bleiben.',
     confirm: 'Alles löschen',
     done: 'Alles gelöscht',
   },
@@ -80,7 +80,7 @@ export function ResetPanel({ onReset }: { onReset: () => void }) {
   const blocked = busy || (confirming === 'all' && typed.trim() !== RESET_ALL_CONFIRMATION);
 
   return (
-    <Panel title="Zurücksetzen" index={3}>
+    <Panel title="Zurücksetzen" index={4}>
       {(Object.keys(RESETS) as ResetKind[]).map((kind) => (
         <div key={kind} className="stack-tight">
           <div className="row-start">

@@ -17,11 +17,16 @@ export function FinaleShow({
   persons,
   step: serverStep,
   onStep,
+  guestReady,
+  onGuest,
 }: {
   finale: FinaleResult;
   persons: Person[];
   step: number;
   onStep(step: number): void;
+  /** R90: "Weiter" on the last station brings on the surprise guest; the label stays plain so nobody sees it coming. */
+  guestReady: boolean;
+  onGuest(): void;
 }) {
   const stations = stationsFor(finale);
   const step = Math.min(Math.max(serverStep, 0), stations.length - 1);
@@ -31,7 +36,8 @@ export function FinaleShow({
     if (s !== step) onStep(s);
   };
 
-  const next = () => setStep(Math.min(step + 1, stations.length - 1));
+  const last = step >= stations.length - 1;
+  const next = () => (last ? guestReady && onGuest() : setStep(step + 1));
   const back = () => setStep(Math.max(step - 1, 0));
 
   useEffect(() => {
@@ -86,7 +92,7 @@ export function FinaleShow({
         <span className="finale-progress">
           {step + 1} / {stations.length}
         </span>
-        <button type="button" className="primary host-big-button" onClick={next} disabled={step >= stations.length - 1}>
+        <button type="button" className="primary host-big-button" onClick={next} disabled={last && !guestReady}>
           Weiter ➡️
         </button>
       </div>

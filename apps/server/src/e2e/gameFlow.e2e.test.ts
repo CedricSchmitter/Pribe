@@ -476,6 +476,10 @@ describe('Pribe-Abend end-to-end (echter Server, Host + 5 Handys)', () => {
       expect(s.finale).toEqual(finale);
     }
 
+    // Without a guest the finale ends on the photo wall as before (R90).
+    expect((await hostState()).guestReady).toBe(false);
+    expect(await call(host, 'guest:start')).toMatchObject({ ok: false, error: 'GUEST_NOT_READY' });
+
     // ---- Anonymity on the phones before every reveal (R22, R52, D07) ----
     const hashes = persons.map((p) => ownerHashOf(p.id));
     const submissionIds = [...submissionOf.values()];

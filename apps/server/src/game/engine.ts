@@ -4,6 +4,8 @@ import {
   type ErrorCode,
   type FinaleResult,
   type GamePhase,
+  type GuestView,
+  type HostGuestView,
   type HostRoundView,
   type HostSnapshot,
   type MyVote,
@@ -18,6 +20,7 @@ import {
 import { transaction, type Db, type Repositories, type RoundRecord, type SubmissionRecord, type VoteRecord } from '../db';
 import { chooseForPresenter, chooseWheel, eligiblePresenters, isValidChoice, type DrawInput, type PoolItem, type Rng } from './draw';
 import { computeFinale } from './finale';
+import { guestIdentity, guestReady } from './guest';
 import { computeLeaderboard, computeReveal, outcomeFor } from './scoring';
 
 export type Result<T = void> = { ok: true; data: T } | { ok: false; error: ErrorCode };
@@ -36,6 +39,8 @@ const toMyVote = (v: VoteRecord): MyVote => ({
 export interface GameState {
   /** Wheel result (R42): presenter and a submission reserved for them. Never sent to clients. */
   wheel?: { presenterId: PersonId; submissionId: SubmissionId } | null;
+  /** Phase `guest` (R90): `null` during the reveal, then when the guest started talking. */
+  guest?: { presentingSince: number | null } | null;
 }
 
 const ROUND_PHASES: readonly GamePhase[] = ['drawing', 'presenting', 'countdown', 'reveal'];
@@ -199,6 +204,33 @@ export class GameEngine {
     return ok(undefined);
   }
 
+  /** R90: finale → big reveal of the surprise guest. */
+  startGuest(): Result {
+    if (this.phase() !== 'finale') return fail('WRONG_PHASE');
+    if (!guestReady(this.repos)) return fail('GUEST_NOT_READY');
+    this.save('guest', { wheel: null, guest: { presentingSince: null } });
+    this.changed();
+    return ok(undefined);
+  }
+
+  /** The guest talks without a time limit, so nothing to arm here. */
+  presentGuest(now = Date.now()): Result {
+    const state = this.state();
+    if (this.phase() !== 'guest' || !state.guest) return fail('WRONG_PHASE');
+    if (state.guest.presentingSince !== null) return ok(undefined);
+    this.save('guest', { ...state, guest: { presentingSince: now } });
+    this.changed();
+    return ok(undefined);
+  }
+
+  /** Guest → finale again; the host keeps its station, so this lands on the photo wall. */
+  leaveGuest(): Result {
+    if (this.phase() !== 'guest') return fail('WRONG_PHASE');
+    this.save('finale', { wheel: null });
+    this.changed();
+    return ok(undefined);
+  }
+
   // ---- Phones ----
 
   /** The owner's vote is stored like any other; scoring ignores it (R52). */
@@ -270,6 +302,15 @@ export class GameEngine {
     return { ...computeFinale(this.repos), leaderboard };
   }
 
+  private guestView(): (GuestView & { presentationId: SubmissionId }) | null {
+    const state = this.state();
+    if (this.phase() !== 'guest' || !state.guest) return null;
+    const identity = guestIdentity(this.repos);
+    const presentation = this.repos.submissions.getGuest();
+    if (!identity || !presentation) return null;
+    return { ...identity, presentingSince: state.guest.presentingSince, presentationId: presentation.id };
+  }
+
   private base(now: number): SnapshotBase & { round: RoundRecord | null } {
     const settings = this.repos.settings.get();
     const rounds = this.repos.rounds.list();
@@ -285,6 +326,7 @@ export class GameEngine {
       reveal: this.revealResult(round),
       finale: this.finale(),
       probe: this.deps.probe?.() ?? false,
+      guest: null,
       round,
     };
   }
@@ -317,15 +359,25 @@ export class GameEngine {
         votedPersonIds: this.repos.votes.listForRound(round.id).map((v) => v.voterId),
       };
     }
-    return { ...base, role: 'host', connectedPersonIds, round: view };
+    const g = this.guestView();
+    let guest: HostGuestView | null = null;
+    if (g) {
+      const { presentationId, ...rest } = g;
+      const kind = this.repos.submissions.get(presentationId)?.kind ?? 'html';
+      guest = { ...rest, presentation: { id: presentationId, kind, url: API_PATHS.file(presentationId) } };
+    }
+    return { ...base, role: 'host', connectedPersonIds, round: view, guest, guestReady: guestReady(this.repos) };
   }
 
   voteSnapshot(me: PersonId | null, now = Date.now()): VoteSnapshot {
     const { round, ...base } = this.base(now);
     const vote = round && me ? this.repos.votes.get(round.id, me) : null;
     const myVote: MyVote | null = vote ? toMyVote(vote) : null;
+    const g = this.guestView();
+    const guest: GuestView | null = g && { name: g.name, emoji: g.emoji, color: g.color, photoUrl: g.photoUrl, presentingSince: g.presentingSince };
     return {
       ...base,
+      guest,
       role: 'vote',
       me,
       round: round ? this.roundView(round) : null,

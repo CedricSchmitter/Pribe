@@ -4,6 +4,7 @@ import { API_PATHS, type AdminPersonDto, type Person, type PersonInput } from '@
 import { api, ApiRequestError } from '../../lib/api';
 import { useToast } from '../../shell';
 import { Avatar } from '../../components/Avatar';
+import { AvatarFields } from './AvatarFields';
 import { AVATAR_COLORS, AVATAR_EMOJIS, randomOf } from './palette';
 import { Panel } from './Panel';
 
@@ -119,54 +120,7 @@ export function PersonsPanel() {
           />
         </label>
 
-        <div className="stack-tight">
-          <span className="label">Emoji</span>
-          <div className="emoji-grid" role="radiogroup" aria-label="Emoji">
-            {AVATAR_EMOJIS.map((em) => (
-              <button
-                key={em}
-                type="button"
-                role="radio"
-                aria-checked={draft.emoji === em}
-                className={`emoji-choice${draft.emoji === em ? ' selected' : ''}`}
-                onClick={() => setDraft({ ...draft, emoji: em })}
-              >
-                {em}
-              </button>
-            ))}
-          </div>
-          <label className="inline-field">
-            <span className="muted">Eigenes:</span>
-            <input
-              className="emoji-input"
-              value={draft.emoji}
-              maxLength={16}
-              onChange={(e) => setDraft({ ...draft, emoji: e.target.value })}
-            />
-          </label>
-        </div>
-
-        <div className="stack-tight">
-          <span className="label">Farbe</span>
-          <div className="color-grid" role="radiogroup" aria-label="Farbe">
-            {AVATAR_COLORS.map((c) => (
-              <button
-                key={c}
-                type="button"
-                role="radio"
-                aria-checked={draft.color.toLowerCase() === c}
-                aria-label={c}
-                className={`color-choice${draft.color.toLowerCase() === c ? ' selected' : ''}`}
-                style={{ background: c }}
-                onClick={() => setDraft({ ...draft, color: c })}
-              />
-            ))}
-            <label className="color-custom" title="Eigene Farbe">
-              <input type="color" value={draft.color} onChange={(e) => setDraft({ ...draft, color: e.target.value })} />
-              <span aria-hidden="true">🎨</span>
-            </label>
-          </div>
-        </div>
+        <AvatarFields value={draft} onChange={(v) => setDraft({ ...draft, ...v })} />
 
         <div className="row-start">
           <button type="submit" disabled={busy || !draft.name.trim() || !draft.emoji.trim()}>

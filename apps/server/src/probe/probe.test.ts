@@ -56,7 +56,7 @@ function seedReal(built: Built) {
 
 function dump(built: Built) {
   const { db, config } = built.ctx;
-  const tables = ['persons', 'submissions', 'rounds', 'votes', 'game', 'settings', 'topic_assignments'];
+  const tables = ['persons', 'submissions', 'rounds', 'votes', 'game', 'settings', 'topic_assignments', 'guest'];
   return {
     tables: Object.fromEntries(tables.map((t) => [t, db.prepare(`SELECT * FROM ${t} ORDER BY 1`).all()])),
     files: readdirSync(config.filesDir).sort(),
@@ -100,7 +100,8 @@ describe('test run (R83)', () => {
     expect((await post(built, cookie, API_PATHS.admin.probeStop)).json()).toEqual({ active: false });
     expect(dump(built)).toEqual(before);
     expect(existsSync(probeDir(config.dataDir))).toBe(false);
-  });
+    // ~1.5 s alone, but above the 5 s default when the whole suite runs in parallel.
+  }, 15_000);
 
   it('bots join, vote, rate the talk and fire a combo until the reveal', async () => {
     const built = await build(testConfig());
@@ -127,6 +128,7 @@ describe('test run (R83)', () => {
     built.ctx.repos.settings.update({ voteCountdownS: 1 });
     const lobby = await waitFor(() => latest.snap?.probe && latest.snap.connectedPersonIds.length === BOT_PROFILES.length && latest.snap);
     expect(lobby.phase).toBe('lobby');
+    expect(lobby.guestReady).toBe(true);
 
     expect(await call('game:start')).toEqual({ ok: true });
     expect(await call('round:draw', { presenterId: lobby.persons[0]!.id })).toEqual({ ok: true });

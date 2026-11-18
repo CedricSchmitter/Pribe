@@ -82,6 +82,34 @@ describe('submissions', () => {
     repos.rounds.create({ presenterId: p.id, submissionId: a.id });
     expect(repos.submissions.listPool().map((s) => s.id)).toEqual([b.id]);
   });
+
+  it('keeps the one guest presentation (R90) out of list, counts and pool, but resumable', () => {
+    const own = repos.submissions.replaceForOwner({ ownerHash: 'h1', kind: 'html', status: 'ready', filePath: 'a' }).submission;
+    const first = repos.submissions.replaceGuest({ kind: 'html', status: 'ready', filePath: 'g' });
+    expect(first.replaced).toBeNull();
+    const second = repos.submissions.replaceGuest({ kind: 'pptx', status: 'converting', filePath: 'g.pptx' });
+    expect(second.replaced?.id).toBe(first.submission.id);
+    expect(repos.submissions.getGuest()?.id).toBe(second.submission.id);
+    expect(repos.submissions.list().map((s) => s.id)).toEqual([own.id]);
+    expect(repos.submissions.countByStatus()).toEqual({ converting: 0, ready: 1, failed: 0 });
+    expect(repos.submissions.listConverting().map((s) => s.id)).toEqual([second.submission.id]);
+    repos.submissions.updateStatus(second.submission.id, { status: 'ready' });
+    expect(repos.submissions.listPool().map((s) => s.id)).toEqual([own.id]);
+    expect(repos.submissions.findByOwnerHash('h1')?.id).toBe(own.id);
+  });
+});
+
+describe('guest', () => {
+  it('stores settings, falls back when the picked person is deleted and resets', () => {
+    expect(repos.guest.get()).toEqual({ enabled: false, personId: null, name: '', emoji: '🎁', color: '#ff3366', photoFile: null });
+    const anna = person('Anna');
+    repos.guest.update({ enabled: true, personId: anna.id, name: 'Gast' });
+    repos.guest.setPhotoFile('x.png');
+    repos.persons.remove(anna.id);
+    expect(repos.guest.get()).toMatchObject({ enabled: true, personId: null, name: 'Gast', photoFile: 'x.png' });
+    expect(repos.guest.reset()).toBe('x.png');
+    expect(repos.guest.get()).toMatchObject({ enabled: false, name: '', photoFile: null });
+  });
 });
 
 describe('game', () => {

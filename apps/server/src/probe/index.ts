@@ -23,6 +23,9 @@ const DEMO_FILES: { file: string; kind: SubmissionKind }[] = [
   { file: 'html/meeting-nicken.html', kind: 'html' },
 ];
 
+/** R90: the test run ends with a surprise guest, so the whole show can be tried out. */
+const DEMO_GUEST = { name: 'Überraschungsgast', emoji: '🎩', color: '#ffd000', file: 'html/ueberraschungsgast.html', kind: 'html' as const };
+
 /** Short limits so a test run reaches the gong and the reveal quickly. */
 const PROBE_SETTINGS = { talkTimeLimitS: 30, voteCountdownS: 10 };
 
@@ -66,6 +69,10 @@ export function createProbe(deps: ProbeDeps) {
     const repos = createRepositories(db);
     return transaction(db, () => {
       repos.settings.update(PROBE_SETTINGS);
+      const guestFile = `${randomUUID()}.${DEMO_GUEST.kind}`;
+      copyFileSync(path.join(demoDir, DEMO_GUEST.file), path.join(filesDir, guestFile));
+      repos.submissions.replaceGuest({ kind: DEMO_GUEST.kind, status: 'ready', filePath: guestFile });
+      repos.guest.update({ enabled: true, name: DEMO_GUEST.name, emoji: DEMO_GUEST.emoji, color: DEMO_GUEST.color });
       return BOT_PROFILES.map((profile, i) => {
         const bot = repos.persons.create(profile);
         const demo = DEMO_FILES[i];
@@ -98,7 +105,7 @@ export function createProbe(deps: ProbeDeps) {
 
     start(): void {
       if (run) return;
-      for (const d of DEMO_FILES) {
+      for (const d of [...DEMO_FILES, DEMO_GUEST]) {
         if (!existsSync(path.join(demoDir, d.file))) throw new Error(`Demo-Datei fehlt: ${d.file}`);
       }
       removeDir();

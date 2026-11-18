@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Grüße vom Überraschungsgast</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #12001f; color: #fff; font-family: system-ui, sans-serif; }
+  section { display: none; height: 100%; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; box-sizing: border-box; }
+  section.on { display: flex; }
+  h1 { font-size: 7vw; margin: 0 0 2vh; background: linear-gradient(90deg, #ffd000, #ff3366, #33ccff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  p { font-size: 3vw; margin: 0; }
+  .big { font-size: 18vw; }
+  footer { position: fixed; bottom: 2vh; right: 3vw; opacity: .5; font-size: 1.6vw; }
+</style>
+</head>
+<body>
+<section class="on"><div class="big">🎩</div><h1>Überraschung!</h1><p>Niemand hat mit mir gerechnet.</p></section>
+<section><h1>Was ich heute gelernt habe</h1><p>Folien, die man nie gesehen hat, sind die besten Folien.</p></section>
+<section><h1>Meine drei Thesen</h1><p>1. Kaffee ist eine Präsentationstechnik.<br>2. Jede Grafik ist ein Kuchendiagramm, wenn man fest genug glaubt.<br>3. Applaus ist Pflicht.</p></section>
+<section><div class="big">👏</div><h1>Danke!</h1><p>Und jetzt: Applaus!</p></section>
+<footer>← → oder Klick</footer>
+<script>
+  const s = [...document.querySelectorAll('section')];
+  let i = 0;
+  const go = (d) => { s[i].classList.remove('on'); i = Math.max(0, Math.min(s.length - 1, i + d)); s[i].classList.add('on'); };
+  addEventListener('keydown', (e) => { if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) go(1); if (['ArrowLeft', 'PageUp'].includes(e.key)) go(-1); });
+  addEventListener('click', () => go(1));
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+/* R90 surprise guest on the beamer. */
+.guest-reveal {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guest-drum,
+.guest-open {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  text-align: center;
+}
+
+.guest-drum-emoji {
+  font-size: clamp(8rem, 18vw, 16rem);
+  line-height: 1;
+}
+
+.guest-drum-text {
+  font-family: var(--font-bold);
+  font-weight: 700;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  margin: 0;
+}
+
+.guest-kicker {
+  background: var(--surface-primary);
+  color: var(--text-on-primary);
+  padding: var(--space-3) var(--space-6);
+  border-radius: 24px;
+  box-shadow: 0 0 80px var(--guest-color);
+}
+
+.guest-hero {
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: clamp(3.5rem, 8vw, 8rem);
+  line-height: 1;
+}
+
+.guest-avatar .avatar {
+  border: 8px solid var(--surface-primary);
+}
+
+.guest-name {
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: clamp(3rem, 6vw, 6rem);
+  margin: 0;
+  text-shadow: 0 0 40px var(--guest-color);
+}
+
+.guest-go {
+  margin-top: var(--space-4);
+}

@@ -55,6 +55,12 @@ export interface HostClientToServerEvents {
   'finale:start': (ack: AckFn) => void;
   /** Station of the finale show; shared by beamer and remote (R80). Only in phase `finale`. */
   'finale:step': (payload: FinaleStepPayload, ack: AckFn) => void;
+  /** finale → guest reveal (R90); only when `guestReady`. */
+  'guest:start': (ack: AckFn) => void;
+  /** Guest reveal → guest presents, without time limit. */
+  'guest:present': (ack: AckFn) => void;
+  /** Guest → back to the finale's last station (photo wall). */
+  'guest:back': (ack: AckFn) => void;
 }
 
 export interface HostServerToClientEvents {

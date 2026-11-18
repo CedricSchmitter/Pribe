@@ -117,7 +117,10 @@ export async function adminRoutes(app: FastifyInstance, ctx: AppContext): Promis
 
   const none: ResetResponseDto = { rounds: 0, topics: 0, submissions: 0, persons: 0 };
 
-  /** Back to a fresh lobby. The pool is derived from rounds, so shown submissions return to it. */
+  /**
+   * Back to a fresh lobby. The pool is derived from rounds, so shown submissions return to it.
+   * The surprise guest (R90) is setup like persons and submissions, so it stays.
+   */
   const resetGame = (): number => {
     const rounds = repos.rounds.list().length;
     repos.rounds.removeAll(); // votes cascade
@@ -148,19 +151,24 @@ export async function adminRoutes(app: FastifyInstance, ctx: AppContext): Promis
 
   app.post(API_PATHS.admin.resetAll, async (req, reply) => {
     if (!ResetAllRequestSchema.safeParse(req.body).success) return reply.code(400).send(apiError('INVALID_PAYLOAD'));
-    const doomed = repos.submissions.list();
+    const guestSubmission = repos.submissions.getGuest();
+    const doomed = guestSubmission ? [...repos.submissions.list(), guestSubmission] : repos.submissions.list();
     const result = transaction(ctx.db, () => {
       const rounds = resetGame();
       const topics = repos.topics.removeAll();
-      const submissions = repos.submissions.removeAll();
+      // The guest presentation goes too, but is not counted as a submission (R90).
+      const submissions = repos.submissions.removeAll() - (guestSubmission ? 1 : 0);
       const persons = repos.persons.removeAll();
-      return { rounds, topics, submissions, persons };
+      const guestPhoto = repos.guest.reset();
+      return { rounds, topics, submissions, persons, guestPhoto };
     });
+    const photoFiles = result.guestPhoto ? [...result.persons.photoFiles, result.guestPhoto] : result.persons.photoFiles;
     await Promise.all([
       ...doomed.map((s) => deleteSubmissionFiles(ctx, s)),
-      ...result.persons.photoFiles.map((f) => rm(path.join(avatarsDir(ctx), f), { force: true })),
+      ...photoFiles.map((f) => rm(path.join(avatarsDir(ctx), f), { force: true })),
     ]);
-    const dto = { ...result, persons: result.persons.count } satisfies ResetResponseDto;
+    const { rounds, topics, submissions } = result;
+    const dto = { rounds, topics, submissions, persons: result.persons.count } satisfies ResetResponseDto;
     req.log.info(dto, 'everything deleted');
     return dto;
   });

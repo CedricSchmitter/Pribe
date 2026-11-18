@@ -1,5 +1,6 @@
 import type { Db } from './database';
 import { createGameRepo } from './repos/game';
+import { createGuestRepo } from './repos/guest';
 import { createPersonsRepo } from './repos/persons';
 import { createRoundsRepo } from './repos/rounds';
 import { createSettingsRepo } from './repos/settings';
@@ -12,6 +13,7 @@ export type { SubmissionRecord } from './repos/submissions';
 export type { RoundRecord } from './repos/rounds';
 export type { VoteRecord } from './repos/votes';
 export type { GameRecord } from './repos/game';
+export type { GuestRecord } from './repos/guest';
 
 export function createRepositories(db: Db) {
   return {
@@ -22,6 +24,7 @@ export function createRepositories(db: Db) {
     votes: createVotesRepo(db),
     settings: createSettingsRepo(db),
     topics: createTopicsRepo(db),
+    guest: createGuestRepo(db),
   };
 }
 export type Repositories = ReturnType<typeof createRepositories>;

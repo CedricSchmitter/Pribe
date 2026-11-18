@@ -279,3 +279,93 @@ describe('persistence', () => {
     db.close();
   });
 });
+
+describe('surprise guest (R90)', () => {
+  function toFinale() {
+    playToCountdown(w);
+    w.engine.castVote(w.p.anna.id, { roundId: w.engine.currentRound()!.id, guessPersonId: w.p.ben.id, stars: 4 });
+    expect(w.engine.closeRound().ok).toBe(true);
+    vi.advanceTimersByTime(20_000);
+    expect(w.engine.startFinale().ok).toBe(true);
+  }
+  function readyGuest() {
+    w.repos.guest.update({ enabled: true, name: 'Die Chefin', emoji: '🎩', color: '#ffd000' });
+    return w.repos.submissions.replaceGuest({ kind: 'html', status: 'ready', filePath: 'guest.html' }).submission;
+  }
+
+  it('the guest presentation never enters the pool', () => {
+    readyGuest();
+    expect(w.engine.hostSnapshot([]).poolSize).toBe(3);
+    expect(w.repos.submissions.listPool().map((s) => s.id).sort()).toEqual([...w.owners.keys()].sort());
+  });
+
+  it('starts only from the finale and only when switched on, named and ready', () => {
+    expect(w.engine.startGuest()).toEqual({ ok: false, error: 'WRONG_PHASE' });
+    toFinale();
+    expect(w.engine.hostSnapshot([]).guestReady).toBe(false);
+    expect(w.engine.startGuest()).toEqual({ ok: false, error: 'GUEST_NOT_READY' });
+    readyGuest();
+    w.repos.guest.update({ enabled: false });
+    expect(w.engine.startGuest()).toEqual({ ok: false, error: 'GUEST_NOT_READY' });
+    w.repos.guest.update({ enabled: true, name: '' });
+    expect(w.engine.startGuest()).toEqual({ ok: false, error: 'GUEST_NOT_READY' });
+    w.repos.guest.update({ name: 'Die Chefin' });
+    w.repos.submissions.updateStatus(w.repos.submissions.getGuest()!.id, { status: 'converting' });
+    expect(w.engine.startGuest()).toEqual({ ok: false, error: 'GUEST_NOT_READY' });
+  });
+
+  it('reveals, then presents without time limit; phones never get the file or the readiness', () => {
+    w.repos.settings.update({ talkTimeLimitS: 60 });
+    toFinale();
+    const sub = readyGuest();
+    expect(w.engine.voteSnapshot(w.p.anna.id)).not.toHaveProperty('guestReady');
+    expect(w.engine.startGuest().ok).toBe(true);
+    expect(w.engine.phase()).toBe('guest');
+
+    const host = w.engine.hostSnapshot([]);
+    expect(host.guest).toEqual({
+      name: 'Die Chefin',
+      emoji: '🎩',
+      color: '#ffd000',
+      photoUrl: null,
+      presentingSince: null,
+      presentation: { id: sub.id, kind: 'html', url: `/api/files/${sub.id}` },
+    });
+    expect(host.round).toBeNull();
+    expect(host.finale).toBeNull();
+
+    expect(w.engine.presentGuest(1_234_567).ok).toBe(true);
+    expect(w.engine.hostSnapshot([]).guest?.presentingSince).toBe(1_234_567);
+    const phone = w.engine.voteSnapshot(w.p.anna.id);
+    expect(phone.guest).toEqual({ name: 'Die Chefin', emoji: '🎩', color: '#ffd000', photoUrl: null, presentingSince: 1_234_567 });
+    expect(JSON.stringify(phone)).not.toContain(sub.id);
+    expect(phone.round).toBeNull();
+
+    // Nothing to vote on and no timer that could end the talk.
+    expect(w.engine.castVote(w.p.anna.id, { roundId: 1, stars: 5 })).toEqual({ ok: false, error: 'VOTING_CLOSED' });
+    vi.advanceTimersByTime(3_600_000);
+    expect(w.engine.phase()).toBe('guest');
+  });
+
+  it('a picked person lends name and avatar', () => {
+    toFinale();
+    readyGuest();
+    w.repos.guest.update({ personId: w.p.cleo.id, name: '' });
+    expect(w.engine.startGuest().ok).toBe(true);
+    expect(w.engine.hostSnapshot([]).guest).toMatchObject({ name: 'Cleo', emoji: '🙂', color: '#123456' });
+  });
+
+  it('goes back to the finale from the guest and deletes nothing', () => {
+    toFinale();
+    const before = w.engine.hostSnapshot([]).finale;
+    expect(w.engine.leaveGuest()).toEqual({ ok: false, error: 'WRONG_PHASE' });
+    readyGuest();
+    expect(w.engine.startGuest().ok).toBe(true);
+    expect(w.engine.presentGuest().ok).toBe(true);
+    expect(w.engine.leaveGuest().ok).toBe(true);
+    expect(w.engine.phase()).toBe('finale');
+    expect(w.engine.hostSnapshot([]).finale).toEqual(before);
+    expect(w.engine.hostSnapshot([]).guestReady).toBe(true);
+    expect(w.engine.startGuest().ok).toBe(true);
+  });
+});

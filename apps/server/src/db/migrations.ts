@@ -89,4 +89,23 @@ export const MIGRATIONS: readonly string[] = [
   -- Talk rating (R84), next to the slide stars.
   ALTER TABLE votes ADD COLUMN talk_stars INTEGER CHECK (talk_stars BETWEEN 1 AND 5);
   `,
+  /* sql */ `
+  -- Surprise guest (R90). Its presentation lives in submissions so the PPTX cleanup and the
+  -- files route work unchanged, but guest = 1 keeps it out of pool, overview and counts.
+  -- Its owner_hash is the fixed word 'guest', which no HMAC can produce (D05).
+  ALTER TABLE submissions ADD COLUMN guest INTEGER NOT NULL DEFAULT 0;
+  CREATE UNIQUE INDEX submissions_one_guest ON submissions(guest) WHERE guest = 1;
+
+  -- person_id set = an existing person is the guest; otherwise name/emoji/color/photo_file.
+  CREATE TABLE guest (
+    id          INTEGER PRIMARY KEY CHECK (id = 1),
+    enabled     INTEGER NOT NULL DEFAULT 0,
+    person_id   TEXT REFERENCES persons(id) ON DELETE SET NULL,
+    name        TEXT NOT NULL DEFAULT '',
+    emoji       TEXT NOT NULL DEFAULT '🎁',
+    color       TEXT NOT NULL DEFAULT '#ff3366',
+    photo_file  TEXT
+  );
+  INSERT INTO guest (id) VALUES (1);
+  `,
 ];
