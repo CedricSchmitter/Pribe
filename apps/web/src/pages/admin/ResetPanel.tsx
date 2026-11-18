@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import { API_PATHS, RESET_ALL_CONFIRMATION, type ResetAllRequest, type ResetResponseDto } from '@pribe/shared';
 import { api, ApiRequestError } from '../../lib/api';
 import { useToast } from '../../shell';

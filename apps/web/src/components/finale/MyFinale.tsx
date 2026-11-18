@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { animate, motion, useMotionValue, useTransform } from 'motion/react';
-import confetti from 'canvas-confetti';
+import { animate, m as motion, useMotionValue, useTransform } from 'motion/react';
+import { withConfetti } from '../../fx/confetti';
 import { AWARD_LABELS_DE, type FinaleResult, type Person } from '@pribe/shared';
 import { AWARD_EMOJI, FinaleAvatar, awardDetail, statsOf } from './common';
 import './finale.css';
@@ -24,7 +24,10 @@ export function MyFinale({ me, finale }: { me: Person; finale: FinaleResult }) {
     const t = setTimeout(() => {
       navigator.vibrate?.(entry.rank <= 3 ? [80, 60, 80, 60, 200] : 120);
       if (entry.rank <= 3 || myAwards.length) {
-        void confetti({ particleCount: 180, spread: 110, startVelocity: 50, origin: { x: 0.5, y: 0.45 }, colors: [me.color, '#ffd000', '#ffffff'] });
+        withConfetti(
+          (confetti) =>
+            void confetti({ particleCount: 180, spread: 110, startVelocity: 50, origin: { x: 0.5, y: 0.45 }, colors: [me.color, '#ffd000', '#ffffff'] }),
+        );
       }
     }, 2200);
     return () => {

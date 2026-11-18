@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from 'motion/react';
-import { FinaleShow } from '../../components/finale';
+import { lazy, Suspense } from 'react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import { ConnectionBadge } from '../../components/ConnectionBadge';
 import { LoginForm } from '../../components/LoginForm';
 import { ProbeBanner } from '../../components/ProbeBanner';
@@ -14,6 +14,8 @@ import { Presenting } from './Presenting';
 import { Reveal } from './Reveal';
 import { useHostGame } from './useHostGame';
 import './host.css';
+
+const FinaleShow = lazy(() => import('../../components/finale/FinaleShow').then((m) => ({ default: m.FinaleShow })));
 
 /** Beamer view (L6). State comes from the server on every (re)connect, so a reload resumes the show. */
 export function HostPage() {
@@ -60,12 +62,14 @@ export function HostPage() {
     ) : phase === 'reveal' && s.reveal ? (
       <Reveal game={game} onError={onError} />
     ) : phase === 'finale' && s.finale ? (
-      <FinaleShow
-        finale={s.finale}
-        persons={s.persons}
-        step={s.finaleStep ?? 0}
-        onStep={(step) => void game.finaleStep(step).then((res) => !res.ok && onError(res.message))}
-      />
+      <Suspense fallback={null}>
+        <FinaleShow
+          finale={s.finale}
+          persons={s.persons}
+          step={s.finaleStep ?? 0}
+          onStep={(step) => void game.finaleStep(step).then((res) => !res.ok && onError(res.message))}
+        />
+      </Suspense>
     ) : null;
 
   return (

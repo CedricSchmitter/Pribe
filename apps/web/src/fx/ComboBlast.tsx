@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import { COMBO_THRESHOLD, type ComboEvent } from '@pribe/shared';
 import { emojiBurst } from './confetti';
 import { flash, shake } from './impact';

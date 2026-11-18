@@ -1,5 +1,5 @@
-import { useState, type ReactNode } from 'react';
-import { motion } from 'motion/react';
+import { Suspense, useState, type ReactNode } from 'react';
+import { m as motion } from 'motion/react';
 import { NavLink, Outlet, useLocation } from 'react-router';
 import { useAuth } from '../lib/auth';
 import { AdminIcon, BeamerIcon, LockIcon, MenuIcon, MoonIcon, RemoteIcon, SunIcon, UploadIcon, VoteIcon } from './icons';
@@ -133,7 +133,15 @@ export function ShellLayout() {
           animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
           transition={{ type: 'spring', stiffness: 260, damping: 18 }}
         >
-          <Outlet />
+          <Suspense
+            fallback={
+              <div className="shell-loading" role="status">
+                Lädt …
+              </div>
+            }
+          >
+            <Outlet />
+          </Suspense>
         </motion.div>
       </main>
     </div>

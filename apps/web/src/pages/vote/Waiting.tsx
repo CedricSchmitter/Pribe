@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import type { Person } from '@pribe/shared';
 import { FloatingEmojis, JumpText } from '../../fx';
 import { Avatar } from './Avatar';

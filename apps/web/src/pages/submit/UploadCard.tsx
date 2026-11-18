@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import type { SubmissionStatusDto, SubmitStatusDto } from '@pribe/shared';
 import { createPortal } from 'react-dom';
 import { emojiRain, sideCannons, Stamp, Sunburst } from '../../fx';

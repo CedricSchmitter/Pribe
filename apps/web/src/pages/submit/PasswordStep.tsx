@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import {
   API_PATHS,
   PERSON_PASSWORD_MIN,

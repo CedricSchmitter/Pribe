@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
+import { LazyMotion, m as motion } from 'motion/react';
 import { API_PATHS, type ProbeStatusDto } from '@pribe/shared';
 import { LoginForm } from '../../components/LoginForm';
 import { ProbeBanner } from '../../components/ProbeBanner';
@@ -11,6 +11,9 @@ import { ResetPanel } from './ResetPanel';
 import { SettingsPanel } from './SettingsPanel';
 import { SubmissionsPanel } from './SubmissionsPanel';
 import './admin.css';
+
+// The person and submission lists animate with `layout`, which the app-wide feature set leaves out.
+const motionMax = () => import('../../motionMax').then((mod) => mod.default);
 
 /** Admin area (P2). Logout lives in the shell's avatar menu. */
 export function AdminPage() {
@@ -46,18 +49,20 @@ export function AdminPage() {
   // The test run swaps every data source, so all panels reload with it.
   const world = `${resets}-${probe ? 'probe' : 'real'}`;
   return (
-    <main className="page admin">
-      {probe && <ProbeBanner />}
-      <h1>Admin</h1>
-      <div className="admin-grid">
-        <PersonsPanel key={`persons-${world}`} />
-        <div className="admin-column">
-          {probe !== null && <ProbePanel active={probe} onChange={setProbe} />}
-          <SettingsPanel key={`settings-${world}`} />
-          <SubmissionsPanel key={`submissions-${world}`} />
-          <ResetPanel onReset={() => setResets((n) => n + 1)} />
+    <LazyMotion features={motionMax} strict>
+      <main className="page admin">
+        {probe && <ProbeBanner />}
+        <h1>Admin</h1>
+        <div className="admin-grid">
+          <PersonsPanel key={`persons-${world}`} />
+          <div className="admin-column">
+            {probe !== null && <ProbePanel active={probe} onChange={setProbe} />}
+            <SettingsPanel key={`settings-${world}`} />
+            <SubmissionsPanel key={`submissions-${world}`} />
+            <ResetPanel onReset={() => setResets((n) => n + 1)} />
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </LazyMotion>
   );
 }

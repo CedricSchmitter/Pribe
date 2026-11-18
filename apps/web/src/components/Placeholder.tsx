@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 
 export function Placeholder({ emoji, title, children }: { emoji: string; title: string; children?: ReactNode }) {
   return (

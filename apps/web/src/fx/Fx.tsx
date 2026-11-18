@@ -1,5 +1,5 @@
 import { Fragment, useMemo, type CSSProperties, type ReactNode } from 'react';
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import './fx.css';
 
 /** Rotating light rays behind something big (winner, reveal). Pure CSS so it stays smooth on phones. */

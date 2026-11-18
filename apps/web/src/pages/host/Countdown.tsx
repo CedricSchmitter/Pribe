@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import { JumpText, shake } from '../../fx';
 import { Avatar } from './Avatar';
 import { ReactionOverlay } from './ReactionOverlay';

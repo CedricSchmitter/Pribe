@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import { useTicker } from './useHostGame';
 
 export function TimeBar({ startedAt, endsAt, now }: { startedAt: number; endsAt: number; now(): number }) {

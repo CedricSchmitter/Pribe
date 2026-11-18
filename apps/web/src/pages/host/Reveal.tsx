@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
-import confetti from 'canvas-confetti';
+import { AnimatePresence, m as motion } from 'motion/react';
+import { withConfetti } from '../../fx/confetti';
 import { emojiBurst, emojiRain, flash, shake, Shockwave, sideCannons, Spotlights, Sunburst } from '../../fx';
 import { Avatar } from './Avatar';
 import type { HostGame } from './useHostGame';
@@ -12,7 +12,7 @@ const DRUM_MS = 2800;
 function celebrate(colors: string[], emoji: string | undefined) {
   flash('#ffffff', 600);
   shake(30, 800);
-  void confetti({ particleCount: 300, spread: 160, startVelocity: 60, origin: { x: 0.5, y: 0.45 }, colors });
+  withConfetti((confetti) => void confetti({ particleCount: 300, spread: 160, startVelocity: 60, origin: { x: 0.5, y: 0.45 }, colors }));
   sideCannons(colors, 2500);
   if (emoji) {
     emojiBurst([emoji], { x: 0.5, y: 0.4 }, 45);

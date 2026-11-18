@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 
 /** Staggered pop-in shared by the admin panels. */
 export function Panel({ title, index, children }: { title: string; index: number; children: ReactNode }) {

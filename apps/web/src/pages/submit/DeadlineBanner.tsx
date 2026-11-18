@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'motion/react';
+import { m as motion } from 'motion/react';
 import type { SubmitStatusDto } from '@pribe/shared';
 import { formatDeadline, formatRemaining } from './time';
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m as motion } from 'motion/react';
 import { API_PATHS, type SubmissionOverviewDto, type SubmissionStatus } from '@pribe/shared';
 import { api } from '../../lib/api';
 import { Panel } from './Panel';
