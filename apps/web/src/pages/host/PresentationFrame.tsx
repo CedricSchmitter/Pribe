@@ -1,12 +1,16 @@
-import { useRef, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { m as motion } from 'motion/react';
 import type { Person, SubmissionKind } from '@pribe/shared';
 import { Avatar } from './Avatar';
+import { DeckcraftFrame } from './DeckcraftFrame';
 import { downloadPptx } from './download';
 
 type Speaker = Pick<Person, 'name' | 'emoji' | 'color' | 'photoUrl'>;
 
-/** HTML in the sandboxed iframe, PPTX as "runs in PowerPoint" with a re-download (rounds and guest, R90). */
+/**
+ * HTML in the sandboxed iframe, PPTX in DeckCraft (D32); if DeckCraft can't start, PPTX falls back to
+ * "runs in PowerPoint" with a download (rounds and guest, R90).
+ */
 export function PresentationFrame({
   kind,
   url,
@@ -20,6 +24,7 @@ export function PresentationFrame({
   afterwards: ReactNode;
 }) {
   const iframe = useRef<HTMLIFrameElement>(null);
+  const [deckcraftFailed, setDeckcraftFailed] = useState(false);
   if (kind === 'html') {
     return (
       <iframe
@@ -32,6 +37,7 @@ export function PresentationFrame({
       />
     );
   }
+  if (!deckcraftFailed) return <DeckcraftFrame url={url} onFailed={() => setDeckcraftFailed(true)} />;
   return (
     <div className="host-pptx">
       <motion.div
@@ -46,14 +52,14 @@ export function PresentationFrame({
         <Avatar person={speaker} size={72} /> <span>{speaker?.name} präsentiert</span>
       </div>
       <ol className="host-pptx-steps">
-        <li>Datei unten in der Download-Leiste öffnen</li>
+        <li>Datei herunterladen und öffnen</li>
         <li>
           <kbd>F5</kbd> drücken – Bühne frei!
         </li>
         <li>{afterwards}</li>
       </ol>
       <button type="button" className="host-big-button" onClick={() => downloadPptx(url)}>
-        ⬇️ Erneut herunterladen
+        ⬇️ Herunterladen
       </button>
     </div>
   );

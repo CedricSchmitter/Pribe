@@ -40,7 +40,7 @@ Design-Vorgaben (Optik + Shell-Navigation, Animationen frei) in DESIGN.md.
 
 ## Open threads / unknowns
 - **Kollege (blockiert Betrieb):** Pi-Modell/RAM, 64-bit-OS + Docker, Reverse Proxy (HTTPS, WebSocket-Upgrade, Upload ≥ 100 MB), Domain. Steht auch in `docs/betrieb.md`.
-- **PowerPoint auf dem Beamer-Rechner** ist seit D23 Voraussetzung. In der Generalprobe (L11) prüfen: Download → Öffnen → F5 → zurück in den Browser.
+- **PPTX läuft seit D32 im Browser (DeckCraft)**, PowerPoint ist nur noch Ausweichweg. In der Generalprobe (L11) auf dem Beamer-Rechner echte PPTX der Teilnehmer abspielen (Schriften, Animationen, Emojis) und den Ausweichweg einmal prüfen.
 - **Ungeprüft im Browser:** den Gong hat niemand gehört; das Sandbox-iframe blockiert im eingebauten Browser (P5). iOS-Vibration ist vermutlich nicht verfügbar.
 - **Nicht von außen geprüft:** Ob die Windows-Firewall eingehende Verbindungen auf Port 3000 (echte Handys im LAN) zulässt. Lokal antworten alle Routen auch über die LAN-IP. Ohne Admin-Rechte lässt sich keine Regel anlegen; sonst die Handy-Ansicht im Browser testen.
 - **Browser-Klickprüfung auf main** ist offen: Im versteckten Browser-Pane laufen keine Animationen (rAF), deshalb nur Text/HTTP geprüft. Die Paket-Sessions haben jeweils im Browser geprüft.

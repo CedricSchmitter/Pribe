@@ -7,3 +7,4 @@ coverage/
 *.tsbuildinfo
 .claude/worktrees/
 .claude/launch.json
+apps/web/public/deckcraft/

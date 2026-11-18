@@ -3,7 +3,6 @@ import { AnimatePresence, m as motion } from 'motion/react';
 import type { HostGuestView } from '@pribe/shared';
 import { Curtain, emojiBurst, emojiRain, fireworks, flash, JumpText, shake, Spotlights, Sunburst } from '../../fx';
 import { Avatar } from './Avatar';
-import { downloadPptx } from './download';
 import { PresentationFrame } from './PresentationFrame';
 import type { HostGame } from './useHostGame';
 import './guest.css';
@@ -115,13 +114,12 @@ function GuestReveal({ guest, onPresent }: { guest: HostGuestView; onPresent(): 
 }
 
 function GuestPresenting({ game, guest, onBack }: { game: HostGame; guest: HostGuestView; onBack(): void }) {
-  // Only a fresh start gets the curtain and the download; a reload mid-talk must not repeat them.
+  // Only a fresh start gets the curtain; a reload mid-talk must not repeat it.
   const [fresh] = useState(() => game.now() - (guest.presentingSince ?? 0) < 4000);
   const [curtain, setCurtain] = useState(fresh);
 
   useEffect(() => {
     if (!fresh) return;
-    if (guest.presentation.kind === 'pptx') downloadPptx(guest.presentation.url);
     const t = setTimeout(() => setCurtain(false), 2600);
     return () => clearTimeout(t);
   }, []);
