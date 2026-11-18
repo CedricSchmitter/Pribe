@@ -6,6 +6,8 @@ type DeckcraftApi = {
 };
 
 const FILE_NAME = 'Praesentation.pptx';
+/** Covers the first, uncached load of the ~33 MB WASM over the Pi's WLAN plus opening the deck. */
+const START_TIMEOUT_MS = 45_000;
 
 /**
  * Plays a PPTX in the DeckCraft web build (`/deckcraft/`, D32). The host bridge (`?host=parent`)
@@ -16,11 +18,20 @@ export function DeckcraftFrame({ url, onFailed }: { url: string; onFailed(): voi
 
   useEffect(() => {
     let cancelled = false;
+    // A build that never loads sends neither `ready` nor `failed`.
+    const timeout = setTimeout(() => {
+      cancelled = true;
+      onFailed();
+    }, START_TIMEOUT_MS);
     async function onMessage(e: MessageEvent) {
       const frame = iframe.current?.contentWindow;
       if (!frame || e.origin !== location.origin || e.source !== frame) return;
       const type = (e.data as { type?: string } | null)?.type;
-      if (type === 'deckcraft:failed') return onFailed();
+      if (cancelled) return;
+      if (type === 'deckcraft:failed') {
+        clearTimeout(timeout);
+        return onFailed();
+      }
       if (type !== 'deckcraft:ready') return;
       try {
         const res = await fetch(url);
@@ -29,16 +40,21 @@ export function DeckcraftFrame({ url, onFailed }: { url: string; onFailed(): voi
         if (cancelled) return;
         frame.postMessage({ type: 'deckcraft:open', name: FILE_NAME, bytes }, location.origin, [bytes]);
         await startShow(frame as Window & { deckcraft?: DeckcraftApi });
+        if (cancelled) return;
+        clearTimeout(timeout);
         // Keys only reach the show when its canvas has focus, not just the iframe.
         iframe.current?.focus();
         frame.document.getElementById('deckcraft_canvas')?.focus();
       } catch {
-        if (!cancelled) onFailed();
+        if (cancelled) return;
+        clearTimeout(timeout);
+        onFailed();
       }
     }
     addEventListener('message', onMessage);
     return () => {
       cancelled = true;
+      clearTimeout(timeout);
       removeEventListener('message', onMessage);
     };
   }, [url]);
